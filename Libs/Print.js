@@ -17,11 +17,11 @@ export class Print {
 		console.log(chalk.yellow(...message));
 	}
 
-    static debug(...message) {
-        console.log(chalk.gray(...message));
-    }
+	static debug(...message) {
+		console.log(chalk.gray(...message));
+	}
 
-    static log(...message) {
-        console.log(chalk.white(...message));
-    }
+	static log(...message) {
+		console.log(chalk.white(...message));
+	}
 }
