@@ -1,0 +1,40 @@
+// TODO: Use another way to get create sticker
+// File://home/rose/BOT/SuryaRB/Message/Features/sticker.js
+// import { Sticker, StickerTypes } from "wa-sticker-formatter";
+
+// export default {
+// 	command: ["sticker", "stiker", "s"],
+// 	description: "Create a sticker",
+// 	category: "Stickers",
+// 	owner: false,
+// 	admin: false,
+// 	hidden: false,
+// 	limit: 0,
+
+// 	// we are know all of the parameters from the handler
+// 	execute: async function (message, { sock }) {
+// 		const q = message.quoted ? message.quoted : message;
+// 		const mime = q.mtype || "";
+// 		if (!/webp|image|video|webm/g.test(mime)) {
+// 			return message.reply("Please reply/send a image with the command");
+// 		}
+// 		const image = await q.download();
+// 		const sticker = new Sticker(image, {
+// 			pack: "@rose_are_rosie", // The pack name
+// 			author: message.pushName || "Rose", // The author name
+// 			type: StickerTypes.FULL, // The sticker type
+// 			categories: ["🤩", "🎉"], // The sticker category
+// 			id: "12345", // The sticker id
+// 			quality: 50, // The quality of the output file
+// 			background: "#000000", // The sticker background color (only for full stickers)
+// 		});
+
+// 		// or get Baileys-MD Compatible Object
+// 		await sock.sendMessage(message.chat, await sticker.toMessage(), {
+// 			quoted: message,
+// 		});
+// 	},
+// 	failed: "Failed to execute the %cmd command\n%error",
+// 	wait: null,
+// 	done: null,
+// };

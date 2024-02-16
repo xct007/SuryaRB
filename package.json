@@ -1,0 +1,47 @@
+{
+	"name": "suryarb",
+	"version": "1.0.0",
+	"description": "WhatsApp Bot",
+	"main": "index.js",
+	"imports": {
+		"@/*": "./*.js"
+	},
+	"engines": {
+		"node": ">=20.0.0"
+	},
+	"type": "module",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/xct007/SuryaRB.git"
+	},
+	"keywords": [
+		"bot",
+		"Baileys",
+		"WABOT",
+		"MD",
+		"WhatsApp",
+		"ITSROSE",
+		"ROSE",
+		"ROSEBOT",
+		"ROSEBOTZ",
+		"ROSEBOTZV1",
+		"ITSROSEBOT"
+	],
+	"author": "FrierenDv",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/xct007/SuryaRB/issues"
+	},
+	"homepage": "https://github.com/xct007/SuryaRB#readme",
+	"dependencies": {
+		"@whiskeysockets/baileys": "github:WhiskeySockets/Baileys",
+		"chalk": "^5.3.0",
+		"dotenv": "^16.4.4",
+		"jimp": "^0.16.13",
+		"link-preview-js": "^3.0.5",
+		"qrcode-terminal": "^0.12.0"
+	}
+}
