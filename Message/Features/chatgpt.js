@@ -26,5 +26,3 @@ export default {
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],
 	done: null,
 };
-
-// Path: Message/Features/ocr.js
