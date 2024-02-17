@@ -122,7 +122,8 @@ export function Messages(upsert, sock) {
 				m.message[m.mtype]?.conversation ||
 				m.message?.conversation ||
 				"";
-			m.reply = (text) => sock.sendMessage(m.chat, { text }, { quoted: m });
+			m.reply = (text) =>
+				sock.sendMessage(m.chat, { text: String(text) }, { quoted: m });
 			m.download = (pathFile) => downloadMedia(m.message, pathFile);
 		} catch (error) {
 			console.error(error);

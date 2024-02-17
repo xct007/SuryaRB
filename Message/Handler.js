@@ -48,88 +48,92 @@ export async function Handler(upsert, sock) {
 		feature.init();
 	}
 
-	for (const name in feature.plugins) {
-		const plugin = feature.plugins[name];
-		if (plugin?.command.includes(command)) {
-			if (plugin.owner && !isOwner) {
-				message.reply("Only the owner can use this command.");
-				return;
-			}
-			if (plugin.admin && message.isGroup && !isAdmin) {
-				message.reply("Only the admin can use this command.");
-				return;
-			}
-			if (plugin.group && !message.isGroup) {
-				message.reply("This command only available in group");
-				return;
-			}
-			if (plugin.private && message.isGroup) {
-				message.reply("This commnad only available in private chat");
-				return;
-			}
-			const miscOptions = {
-				args,
-				sock,
-				conn: sock,
-				api,
-				groupMetadata,
-				isOwner,
-				isAdmin,
-				command,
-				text: message.text,
-				usedPrefix,
-			};
-			try {
-				// this is useless, but as you want
-				if (plugin.wait) {
-					const waitMessage = Array.isArray(plugin.wait)
-						? plugin.wait[Math.floor(Math.random() * plugin.wait.length)]
-						: plugin.wait;
-
-					await sock.sendMessage(
-						message.chat,
-						{
-							text: waitMessage
-								.replace("%name", message.pushName)
-								.replace("%tag", "@" + message.sender.replace(/[^0-9]/g, ""))
-								.replace("%group", message.isGroup ? groupMetadata.subject : ""),
-							mentions: [message.sender],
-						},
-						{ quoted: message }
-					);
+	try {
+		for (const name in feature.plugins) {
+			const plugin = feature.plugins[name];
+			if (plugin?.command.includes(command)) {
+				if (plugin.owner && !isOwner) {
+					message.reply("Only the owner can use this command.");
+					return;
 				}
-				const old = performance.now();
-
-				// execute
-				await plugin.execute(message, miscOptions);
-
-				// this is useless, but as you want
-				if (plugin.done) {
-					const doneMessage = Array.isArray(plugin.done)
-						? plugin.done[Math.floor(Math.random() * plugin.done.length)]
-						: plugin.done;
-					await sock.sendMessage(
-						message.chat,
-						{
-							text: doneMessage
-								.replace("%name", message.pushName)
-								.replace("%tag", "@" + message.sender.replace(/^[0-9]/g, ""))
-								.replace("%group", message.isGroup ? groupMetadata.subject : "")
-								.replace("%exec", `${(performance.now() - old).toFixed(5)} ms`),
-							mentions: [message.sender],
-						},
-						{ quoted: message }
-					);
+				if (plugin.admin && message.isGroup && !isAdmin) {
+					message.reply("Only the admin can use this command.");
+					return;
 				}
-			} catch (error) {
-				console.log(error);
-				if (plugin.failed) {
-					message.reply(
-						plugin.failed.replace("%cmd", command).replace("%error", String(error))
-					);
+				if (plugin.group && !message.isGroup) {
+					message.reply("This command only available in group");
+					return;
+				}
+				if (plugin.private && message.isGroup) {
+					message.reply("This commnad only available in private chat");
+					return;
+				}
+				const miscOptions = {
+					args,
+					sock,
+					conn: sock,
+					api,
+					groupMetadata,
+					isOwner,
+					isAdmin,
+					command,
+					text: message.text,
+					usedPrefix,
+				};
+				try {
+					// this is useless, but as you want
+					if (plugin.wait) {
+						const waitMessage = Array.isArray(plugin.wait)
+							? plugin.wait[Math.floor(Math.random() * plugin.wait.length)]
+							: plugin.wait;
+
+						await sock.sendMessage(
+							message.chat,
+							{
+								text: waitMessage
+									.replace("%name", message.pushName)
+									.replace("%tag", "@" + message.sender.replace(/[^0-9]/g, ""))
+									.replace("%group", message.isGroup ? groupMetadata.subject : ""),
+								mentions: [message.sender],
+							},
+							{ quoted: message }
+						);
+					}
+					const old = performance.now();
+
+					// execute
+					await plugin.execute(message, miscOptions);
+
+					// this is useless, but as you want
+					if (plugin.done) {
+						const doneMessage = Array.isArray(plugin.done)
+							? plugin.done[Math.floor(Math.random() * plugin.done.length)]
+							: plugin.done;
+						await sock.sendMessage(
+							message.chat,
+							{
+								text: doneMessage
+									.replace("%name", message.pushName)
+									.replace("%tag", "@" + message.sender.replace(/^[0-9]/g, ""))
+									.replace("%group", message.isGroup ? groupMetadata.subject : "")
+									.replace("%exec", `${(performance.now() - old).toFixed(5)} ms`),
+								mentions: [message.sender],
+							},
+							{ quoted: message }
+						);
+					}
+				} catch (error) {
+					console.log(error);
+					if (plugin.failed && typeof plugin.failed === "string") {
+						message.reply(
+							plugin.failed.replace("%cmd", command).replace("%error", String(error))
+						);
+					}
 				}
 			}
 		}
+	} catch (error) {
+		console.error(error);
 	}
 	// we don't need to log every message
 	Print.info(`From: ${message.sender}
