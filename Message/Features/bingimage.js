@@ -22,7 +22,7 @@ export default {
 		const { status, result, message } = data;
 
 		if (!status) {
-			throw new Error(message);
+			return m.reply(message);
 		}
 
 		const { images } = result;

@@ -30,7 +30,7 @@ export default {
 		const { status, result, message } = data;
 
 		if (!status) {
-			throw message
+			return m.reply(message);
 		}
 		
 		await sock.sendMessage(m.chat, { text: result.messages.content }, { quoted: m });

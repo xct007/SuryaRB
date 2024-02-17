@@ -29,7 +29,7 @@ export default {
 			const { status, result, message: error } = data;
 
 			if (!status) {
-				throw error;
+				return m.reply(error);
 			}
 
 			await sock.sendMessage(m.chat, { text: result.message }, { quoted: m });
@@ -43,7 +43,7 @@ export default {
 			const { status, result, message } = data;
 
 			if (!status) {
-				throw message;
+				return m.reply(message);
 			}
 
 			await sock.sendMessage(m.chat, { text: result.original }, { quoted: m });
