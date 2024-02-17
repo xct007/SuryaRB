@@ -28,7 +28,7 @@ export async function Handler(upsert, sock) {
 		? message.text.slice(usedPrefix.length).split(/ +/).shift().toLowerCase()
 		: "";
 
-	const text = message.text.substring(message.text.indexOf(" ") + 1);
+	const text = message?.text?.substring(message.text.indexOf(" ") + 1) || "";
 	const args = text.split(" ");
 	const groupMetadata = message.isGroup
 		? await sock.groupMetadata(message.chat)
