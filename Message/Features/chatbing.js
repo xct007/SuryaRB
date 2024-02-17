@@ -12,35 +12,43 @@ export default {
 	group: false,
 	private: false,
 
-	execute: async function (m, { sock, api, text }) {
+	async execute(m, { sock, api, text }) {
 		if (!text) {
-			return;
+			return m.reply("Need text.");
 		}
-		let init_image = null;
-		const q = m.quoted ? m.quoted : m;
-		const mime = q.mtype || "";
-		if (/webp|image|video|webm/g.test(mime)) {
-			const media = await q.download();
+
+		let initImage = null;
+		const quotedMessage = m.quoted ? m.quoted : m;
+		const mimeType = quotedMessage.mtype || "";
+
+		if (/webp|image|video|webm/g.test(mimeType)) {
+			const media = await quotedMessage.download();
 			const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-			init_image = await telegraph(buffer).catch(() => null);
+			initImage = await telegraph(buffer).catch(() => null);
 		}
+
 		const { data } = await api.post("/chatGPT/bing_chat", {
 			prompt: text,
-			init_image,
+			init_image: initImage,
 			time_zone: "Asia/Jakarta",
 			tone: "Balanced",
 			strip_markdown: false,
 		});
+
 		const { status, message, result } = data;
+
 		if (!status) {
 			return m.reply(message);
 		}
+
 		const {
 			sources,
 			message: { content },
 			invocation,
 		} = result;
+
 		await sock.sendMessage(m.chat, { text: content }, { quoted: m });
+
 		if (invocation?.type === "image") {
 			try {
 				for (const url of invocation.images) {
@@ -54,7 +62,9 @@ export default {
 						{ quoted: m }
 					);
 				}
-			} catch {}
+			} catch (error) {
+				console.error(error);
+			}
 		}
 	},
 
