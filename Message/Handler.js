@@ -77,7 +77,7 @@ export async function Handler(upsert, sock) {
 					isOwner,
 					isAdmin,
 					command,
-					text: message.text,
+					text,
 					usedPrefix,
 				};
 				try {
