@@ -5,7 +5,7 @@ export const telegraph = async (buffer) => {
 		throw new Error("Buffer is not a buffer");
 	}
 	const form = new FormData();
-    const blob = new Blob([buffer], { type: "image/jpeg" });
+	const blob = new Blob([buffer], { type: "image/jpeg" });
 	form.append("file", blob, "file");
 	const { data } = await axios.post("https://telegra.ph/upload", form, {
 		headers: {

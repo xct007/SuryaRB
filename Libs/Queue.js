@@ -27,7 +27,7 @@ class Queue {
 		this.queue.list[jid].splice(this.queue.list[jid].indexOf(plugin), 1);
 	}
 	get list() {
-        return this.queue.list;
-    }
+		return this.queue.list;
+	}
 }
 export default new Queue();
