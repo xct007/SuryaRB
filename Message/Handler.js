@@ -2,12 +2,12 @@
 // File://home/rose/BOT/SuryaRB/Message/Handler.js
 import { performance } from "perf_hooks";
 import Feature from "./Feature.js";
+import Queue from "../Libs/Queue.js";
 import { ApiRequest as api } from "../Utils/ApiRequest.js";
 import { Messages } from "../Utils/Messages.js";
 import { Prefix } from "../Utils/Prefix.js";
 import { Config } from "../config.js";
 import { Print } from "../Libs/Print.js";
-
 /**
  * Handles incoming messages
  * @param {import("@whiskeysockets/baileys").BaileysEventMap["messages.upsert"]} upsert - The upsert event
@@ -47,11 +47,15 @@ export async function Handler(upsert, sock) {
 	if (!feature.isInit) {
 		feature.init();
 	}
-
+	let executed_plugin = null;
 	try {
 		for (const name in feature.plugins) {
 			const plugin = feature.plugins[name];
 			if (plugin?.command.includes(command)) {
+				if (Queue.exist(message.sender, plugin)) {
+					message.reply("You are still using this command");
+					return;
+				}
 				if (plugin.owner && !isOwner) {
 					message.reply("Only the owner can use this command.");
 					return;
@@ -68,6 +72,8 @@ export async function Handler(upsert, sock) {
 					message.reply("This commnad only available in private chat");
 					return;
 				}
+				executed_plugin = plugin;
+				Queue.add(message.sender, executed_plugin);
 				const miscOptions = {
 					args,
 					sock,
@@ -135,6 +141,7 @@ export async function Handler(upsert, sock) {
 	} catch (error) {
 		console.error(error);
 	}
+	Queue.remove(message.sender, executed_plugin);
 	// we don't need to log every message
 	Print.info(`From: ${message.sender}
 In: ${message.isGroup ? groupMetadata.subject : "Private Chat"}

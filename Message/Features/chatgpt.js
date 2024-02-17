@@ -23,6 +23,6 @@ export default {
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",
-	wait: ["Please wait %tag", "Hold on %tag, fetching response"],
+	wait: null,
 	done: null,
 };
