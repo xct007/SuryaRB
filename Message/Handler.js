@@ -34,7 +34,7 @@ export async function Handler(upsert, sock) {
 		? await sock.groupMetadata(message.chat)
 		: {};
 	const isOwner = Config.owners
-		.map((x) => x.replace(/^[0-9]/g, "") + "@s.whatsapp.net")
+		.map((x) => x.replace(/[^0-9]/g, "") + "@s.whatsapp.net")
 		.includes(message.sender);
 	const isAdmin = message.isGroup
 		? groupMetadata.participants
@@ -52,11 +52,11 @@ export async function Handler(upsert, sock) {
 		const plugin = feature.plugins[name];
 		if (plugin?.command.includes(command)) {
 			if (plugin.owner && !isOwner) {
-				message.reply("You are not the owner of this bot.");
+				message.reply("Only the owner can use this command.");
 				return;
 			}
 			if (plugin.admin && message.isGroup && !isAdmin) {
-				message.reply("You are not an admin of this group.");
+				message.reply("Only the admin can use this command.");
 				return;
 			}
 			if (plugin.group && !message.isGroup) {
@@ -137,7 +137,5 @@ In: ${message.isGroup ? groupMetadata.subject : "Private Chat"}
 Type: ${message.mtype}
 RawText: ${message.text}
 Command: ${isCommand ? command : "None"}
-Text: ${message.text}
-Args: ${args}
 `);
 }
