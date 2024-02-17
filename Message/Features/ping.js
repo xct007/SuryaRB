@@ -6,7 +6,7 @@ export default {
 	// Command to trigger the execution
 	command: ["ping", "p"],
 	// Description of the command, displayed in the menu
-	description: "Get the bot's response time.",
+	description: "Get the bot response time.",
 	// Category as header in the menu
 	category: "Message",
 
