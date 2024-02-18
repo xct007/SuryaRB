@@ -18,14 +18,17 @@
    ```
 3. **Create or rename the .env.example file to .env**
    ```sh
-   ITSROSE_APIKEY=YOUR_APIKEY_HERE
+   ITSROSE_APIKEY=PASTE_YOUR_APIKEY_HERE
    ```
+   Get your API key from [API Dashboard](https://dash.itsrose.life)
 4. **Run the application**
    ```sh
    npm start
    ```
 
 ## Creating features/plugins
+
+Create new file in `Message/Features` folder with the following template
 
 ```javascript
 export default {
@@ -52,27 +55,30 @@ export default {
 	private: false,
 
 	// Handler function to execute the command
-	execute: async function (m, {
-        args,
-        sock,
-        conn,
-        api,
-        groupMetadata,
-        isOwner,
-        isAdmin,
-        command,
-        text,
-        usedPrefix,
-    }) {
+	execute: async function (
+		m,
+		{
+			args,
+			sock,
+			conn,
+			api,
+			groupMetadata,
+			isOwner,
+			isAdmin,
+			command,
+			text,
+			usedPrefix,
+		}
+	) {
 		// Logic
-        m.reply("Hello World");
+		m.reply("Hello World");
 	},
 
 	// Message to display when the command execution fails
 	// %cmd alias for the command, %error alias for the error
 	failed: "Failed to execute the %cmd command\n\n%error",
 
-	// Message to display while waiting for the command to finish
+	// Message to display while waiting for the command to finish (useless for now)
 	// aliase:
 	// %name = user pushName
 	// %tag = tag the user
@@ -80,7 +86,7 @@ export default {
 	wait: null, // null | string | string[] | any
 	// wait: ["Please wait %tag", "Hold on %tag, fetching response"], // random if array
 
-	// Message to display when the command execution is done
+	// Message to display when the command execution is done (useless for now)
 	// aliase:
 	// %name = user pushName
 	// %tag = tag the user
