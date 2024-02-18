@@ -1,4 +1,3 @@
-// TODO: Refactor
 // File://home/rose/BOT/SuryaRB/Utils/Messages.js
 import {
 	getContentType,
@@ -50,7 +49,6 @@ const downloadMedia = async (message, pathFile) => {
 export function Messages(upsert, sock) {
 	const { messages } = upsert;
 	const m = messages[0];
-
 	if (m.key) {
 		const { id, remoteJid } = m.key;
 		m.id = id;
@@ -64,21 +62,30 @@ export function Messages(upsert, sock) {
 	if (m.message) {
 		m.mtype = getContentType(m.message);
 
-		if (m.mtype === "ephemeralMessage" || m.mtype === "viewOnceMessage") {
+		if (m.mtype === "ephemeralMessage") {
 			m.message = m.message[m.mtype].message;
 			m.mtype = getContentType(m.message);
+			if (m.mtype === "viewOnceMessageV2") {
+				m.message = m.message[m.mtype].message;
+				m.mtype = getContentType(m.message);
+			}
 		}
 		m.contextInfo = m.message[m.mtype].contextInfo || {};
 
 		try {
 			const quoted = m.contextInfo.quotedMessage || null;
 			if (quoted) {
-				if (quoted["ephemeralMessage"]) {
+				if (quoted.ephemeralMessage) {
 					const tipe = Object.keys(quoted.ephemeralMessage.message)[0];
 					if (tipe === "viewOnceMessage") {
 						m.quoted = {
 							sender: jidNormalizedUser(m.contextInfo.participant),
 							message: quoted.ephemeralMessage.message.viewOnceMessage.message,
+						};
+					} else if (tipe === "viewOnceMessageV2") {
+						m.quoted = {
+							sender: jidNormalizedUser(m.contextInfo.participant),
+							message: quoted.ephemeralMessage.message.viewOnceMessageV2.message,
 						};
 					} else {
 						m.quoted = {
@@ -86,11 +93,6 @@ export function Messages(upsert, sock) {
 							message: quoted.ephemeralMessage.message,
 						};
 					}
-				} else if (quoted["viewOnceMessage"]) {
-					m.quoted = {
-						sender: jidNormalizedUser(m.contextInfo.participant),
-						message: quoted.viewOnceMessage.message,
-					};
 				} else {
 					m.quoted = {
 						sender: jidNormalizedUser(m.contextInfo.participant),
