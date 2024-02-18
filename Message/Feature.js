@@ -19,10 +19,10 @@ class Feature {
 	#watch = () => {
 		watch(this.folder, (eventType, filename) => {
 			if (eventType === "change") {
-				console.log(`File ${filename} has changed. Re-importing...`);
+				Print.info(`File ${filename} has changed. Re-importing...`);
 				this.#import(filename);
 			} else if (eventType === "rename" && !filename) {
-				console.log(`File ${filename} has been deleted. Removing from plugins...`);
+				Print.info(`File ${filename} has been removed. Deleting...`);
 				delete this.plugins[filename];
 			}
 		});
@@ -43,8 +43,8 @@ class Feature {
 			this.plugins[file] = importedModule;
 			return importedModule;
 		} catch (error) {
-			console.log(error);
 			Print.error(`Failed to import ${file}`);
+			Print.error(error);
 		}
 	};
 
@@ -59,7 +59,7 @@ class Feature {
 
 		this.#watch();
 		this.isInit = true;
-		console.debug(Object.keys(this.plugins));
+		Print.success(Object.keys(this.plugins));
 	};
 }
 
