@@ -10,6 +10,10 @@ export default {
 	group: false,
 	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions}
+	 */
 	execute: async function (m, { sock, api, text }) {
 		if (!text) {
 			return;
