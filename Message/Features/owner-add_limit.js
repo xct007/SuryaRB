@@ -17,11 +17,6 @@ export default {
 	execute: async function (m, { sock, db, args }) {
 		const who = m.quoted?.sender || m.mentionedJid[0] || "";
 		const [cmd, number] = args.filter((x) => "@" + x !== who && !x.startsWith("@"));
-		console.log({
-			who,
-			cmd,
-			number,
-		});
 		const user = db.users.get(who);
 		if (!user) {
 			return m.reply("User not found");
