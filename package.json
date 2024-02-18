@@ -8,7 +8,9 @@
 	},
 	"type": "module",
 	"scripts": {
-		"start": "node index.js"
+		"start": "node index.js",
+		"prettier:check": "prettier . --check",
+		"prettier:write": "prettier . --write"
 	},
 	"repository": {
 		"type": "git",
@@ -44,5 +46,8 @@
 		"link-preview-js": "^3.0.5",
 		"node-webpmux": "^3.2.0",
 		"qrcode-terminal": "^0.12.0"
+	},
+	"devDependencies": {
+		"prettier": "^3.2.5"
 	}
 }

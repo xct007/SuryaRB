@@ -1,0 +1,9 @@
+arrowParens: "always"
+trailingComma: "es5"
+semi: true
+useTabs: true
+tabWidth: 0
+quoteProps: "as-needed"
+printWidth: 80
+endOfLine: "crlf"
+bracketSpacing: true
