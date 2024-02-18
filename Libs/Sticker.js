@@ -77,13 +77,19 @@ class Sticker {
 	 * @private
 	 */
 	metadata(options) {
-		return Buffer.concat([
+		const loadDataExif = Buffer.concat([
 			Buffer.from([
 				0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00,
 			]),
 			Buffer.from(JSON.stringify(options), "utf-8"),
-		]).writeUIntLE(Buffer.from(JSON.stringify(options), "utf-8").length, 14, 4);
+		]);
+		loadDataExif.writeUIntLE(
+			Buffer.from(JSON.stringify(options), "utf-8").length,
+			14,
+			4
+		);
+		return loadDataExif;
 	}
 	/**
 	 * Create a sticker from the media.
@@ -102,6 +108,7 @@ class Sticker {
 		const image = new webp.Image();
 		await image.load(webpBuffer);
 		const exif = this.metadata(this.exif(packname, author, emojis));
+		console.log(exif);
 		image.exif = exif;
 		return await image.save(null);
 	}
