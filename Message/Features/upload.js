@@ -14,7 +14,7 @@ export default {
 		const q = m.quoted ? m.quoted : m;
 		const mime = q.mtype || "";
 		if (!/webp|image|video|webm/g.test(mime)) {
-			return m.reply("Please reply/send a image with the command");
+			return m.reply("Please reply/send an image with the command");
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
