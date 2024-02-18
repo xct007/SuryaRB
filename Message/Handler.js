@@ -8,6 +8,7 @@ import { Messages } from "../Utils/Messages.js";
 import { Prefix } from "../Utils/Prefix.js";
 import { Config } from "../config.js";
 import { Print } from "../Libs/Print.js";
+
 /**
  * Handles incoming messages
  * @param {import("@whiskeysockets/baileys").BaileysEventMap["messages.upsert"]} upsert - The upsert event
@@ -17,21 +18,21 @@ export async function Handler(upsert, sock) {
 	if (upsert.type !== "notify") {
 		return;
 	}
+
 	const message = Messages(upsert, sock);
 	if (!message) {
 		return;
 	}
+
 	const [isCommand, prefix] = Prefix(message.text);
 	const usedPrefix = isCommand ? message.text.split("")[0] : "";
-
 	const command = isCommand
 		? message.text.slice(usedPrefix.length).split(/ +/).shift().toLowerCase()
 		: "";
-
 	const text = message?.text
 		?.replace(new RegExp(`^${usedPrefix}${command}`, "i"), "")
 		.trim();
-	const args = text?.split(" ") || [];
+	const args = text?.split(" ").map((x) => x.trim()) || [];
 	const groupMetadata = message.isGroup
 		? await sock.groupMetadata(message.chat)
 		: {};
@@ -49,6 +50,7 @@ export async function Handler(upsert, sock) {
 	if (!feature.isInit) {
 		feature.init();
 	}
+
 	let executed_plugin = null;
 	try {
 		for (const name in feature.plugins) {
@@ -107,29 +109,29 @@ export async function Handler(upsert, sock) {
 					// 		{ quoted: message }
 					// 	);
 					// }
-					const old = performance.now();
+					// const old = performance.now();
 
 					// execute
 					await plugin.execute(message, miscOptions);
 
 					// this is useless, but as you want
-					if (plugin.done) {
-						const doneMessage = Array.isArray(plugin.done)
-							? plugin.done[Math.floor(Math.random() * plugin.done.length)]
-							: plugin.done;
-						await sock.sendMessage(
-							message.chat,
-							{
-								text: doneMessage
-									.replace("%name", message.pushName)
-									.replace("%tag", "@" + message.sender.replace(/^[0-9]/g, ""))
-									.replace("%group", message.isGroup ? groupMetadata.subject : "")
-									.replace("%exec", `${(performance.now() - old).toFixed(5)} ms`),
-								mentions: [message.sender],
-							},
-							{ quoted: message }
-						);
-					}
+					// if (plugin.done) {
+					// 	const doneMessage = Array.isArray(plugin.done)
+					// 		? plugin.done[Math.floor(Math.random() * plugin.done.length)]
+					// 		: plugin.done;
+					// 	await sock.sendMessage(
+					// 		message.chat,
+					// 		{
+					// 			text: doneMessage
+					// 				.replace("%name", message.pushName)
+					// 				.replace("%tag", "@" + message.sender.replace(/^[0-9]/g, ""))
+					// 				.replace("%group", message.isGroup ? groupMetadata.subject : "")
+					// 				.replace("%exec", `${(performance.now() - old).toFixed(5)} ms`),
+					// 			mentions: [message.sender],
+					// 		},
+					// 		{ quoted: message }
+					// 	);
+					// }
 				} catch (error) {
 					console.log(error);
 					if (plugin.failed && typeof plugin.failed === "string") {
@@ -144,7 +146,6 @@ export async function Handler(upsert, sock) {
 		console.error(error);
 	}
 	Queue.remove(message.sender, executed_plugin);
-	// we don't need to log every message
 	Print.info(`From: ${message.sender}
 In: ${message.isGroup ? groupMetadata.subject : "Private Chat"}
 Type: ${message.mtype}

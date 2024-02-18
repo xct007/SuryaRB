@@ -59,7 +59,7 @@ class Feature {
 
 		this.#watch();
 		this.isInit = true;
-		Print.debug(Object.keys(this.plugins));
+		console.debug(Object.keys(this.plugins));
 	};
 }
 
