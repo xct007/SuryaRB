@@ -1,4 +1,3 @@
-// File://home/rose/BOT/SuryaRB/Message/Features/chatgpt.js
 export default {
 	command: ["gpt", "ai"],
 	description: "Chat with AI.",
@@ -10,16 +9,21 @@ export default {
 	group: false,
 	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
 	execute: async function (m, { sock, api, text }) {
-		if (!text) {
-			m.reply("Please provide a prompt.");
-			return;
-		}
-		const { data } = await api.post("/chatGPT/completions", {
-			prompt: text,
+		m.replyUpdate("...", async (update) => {
+			if (!text) {
+				return update("Please provide a prompt.");
+			}
+			const { data } = await api.post("/chatGPT/completions", {
+				prompt: text,
+			});
+			const { message } = data;
+			update(message);
 		});
-		const { message } = data;
-		await sock.sendMessage(m.chat, { text: message }, { quoted: m });
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",

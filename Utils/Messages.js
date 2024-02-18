@@ -29,15 +29,19 @@ const downloadMedia = async (message, pathFile) => {
 
 /**
  * @typedef ExtendedWAMessage
- * @property {string} chat
- * @property {string} sender
- * @property {boolean} isGroup
- * @property {string} mtype
- * @property {string} text
- * @property {import("@whiskeysockets/baileys").proto.IMessageContextInfo} contextInfo
- * @property {import("@whiskeysockets/baileys").WAMessage} quoted
- * @property {() => Promise<Buffer | null>} download
- * @property {(text: string) => void} reply
+ * @property {string} chat - The chat JID.
+ * @property {string} sender - The sender JID.
+ * @property {boolean} isGroup - If the message is from a group.
+ * @property {string} mtype - The message type.
+ * @property {string} text - The message text.
+ * @property {import("@whiskeysockets/baileys").proto.IMessageContextInfo} contextInfo - The context info.
+ * @property {import("@whiskeysockets/baileys").WAMessage} quoted - The quoted message.
+ * @property {() => Promise<Buffer | null>} download - Download the media and return the buffer.
+ * @property {(text: string) => void} reply - Reply to the message.
+ * @property {(text: string, cb: (update: (n_text: string) => void) => void) => void} replyUpdate - Update the message with a new text.
+ * @property {() => void} delete
+ * @property {(emoji: string) => void} react
+ * @property {string[]} mentionedJid
  */
 
 /**
@@ -79,26 +83,27 @@ export function Messages(upsert, sock) {
 					const tipe = Object.keys(quoted.ephemeralMessage.message)[0];
 					if (tipe === "viewOnceMessage") {
 						m.quoted = {
-							sender: jidNormalizedUser(m.contextInfo.participant),
+							participant: jidNormalizedUser(m.contextInfo.participant),
 							message: quoted.ephemeralMessage.message.viewOnceMessage.message,
 						};
 					} else if (tipe === "viewOnceMessageV2") {
 						m.quoted = {
-							sender: jidNormalizedUser(m.contextInfo.participant),
+							participant: jidNormalizedUser(m.contextInfo.participant),
 							message: quoted.ephemeralMessage.message.viewOnceMessageV2.message,
 						};
 					} else {
 						m.quoted = {
-							sender: jidNormalizedUser(m.contextInfo.participant),
+							participant: jidNormalizedUser(m.contextInfo.participant),
 							message: quoted.ephemeralMessage.message,
 						};
 					}
 				} else {
 					m.quoted = {
-						sender: jidNormalizedUser(m.contextInfo.participant),
+						participant: jidNormalizedUser(m.contextInfo.participant),
 						message: quoted,
 					};
 				}
+				m.quoted.sender = m.quoted.participant;
 				m.quoted.mtype = m.quoted.type = Object.keys(m.quoted.message)[0];
 				m.quoted.mentionedJid =
 					m.quoted.message[m.quoted.mtype].contextInfo?.mentionedJid || [];
@@ -109,13 +114,19 @@ export function Messages(upsert, sock) {
 					m.quoted.message[m.quoted.mtype]?.description ||
 					m.quoted.message[m.quoted.mtype]?.caption ||
 					m.quoted.message[m.quoted.mtype]?.hydratedTemplate?.hydratedContentText ||
-					m.quoted.message[m.quoted.mtype] ||
 					"";
 				m.quoted.key = {
 					id: m.contextInfo.stanzaId,
 					fromMe: m.sender === jidNormalizedUser(sock.user.id),
 					remoteJid: m.sender,
 				};
+				m.quoted.react = (emoji) =>
+					sock.sendMessage(m.chat, {
+						reaction: {
+							text: String(emoji),
+							key: m.quoted.key,
+						},
+					});
 				m.quoted.delete = () => sock.sendMessage(m.chat, { delete: m.quoted.key });
 				m.quoted.download = (pathFile) => downloadMedia(m.quoted.message, pathFile);
 			} else {
@@ -127,12 +138,38 @@ export function Messages(upsert, sock) {
 				m.message[m.mtype]?.conversation ||
 				m.message?.conversation ||
 				"";
+			m.react = (emoji) =>
+				sock.sendMessage(m.chat, {
+					reaction: {
+						text: String(emoji),
+						key: m.key,
+					},
+				});
 			m.reply = (text) =>
 				sock.sendMessage(m.chat, { text: String(text) }, { quoted: m });
+			m.replyUpdate = async (text, cb) => {
+				const response = await sock.sendMessage(
+					m.chat,
+					{ text: String(text) },
+					{ quoted: m }
+				);
+				/**
+				 * @param {string} n_text - The new text to update the message.
+				 * @returns {void}
+				 */
+				cb((n_text) => {
+					sock.sendMessage(m.chat, {
+						text: n_text,
+						edit: response.key,
+					});
+				});
+			};
+			m.delete = () => sock.sendMessage(m.chat, { delete: m.key });
 			m.download = (pathFile) => downloadMedia(m.message, pathFile);
 		} catch (error) {
 			console.error(error);
 		}
 	}
+	console.log(m);
 	return m;
 }
