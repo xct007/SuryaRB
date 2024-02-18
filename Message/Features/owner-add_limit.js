@@ -12,7 +12,7 @@ export default {
 
 	/**
 	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
-	 * @param {import("../Handler").miscOptions}
+	 * @param {import("../Handler").miscOptions} options - The options.
 	 */
 	execute: async function (m, { sock, db, args }) {
 		const who = m.quoted?.sender || m.mentionedJid[0] || "";
