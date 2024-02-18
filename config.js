@@ -10,6 +10,6 @@ export const Config = {
 	database: {
 		path: "./database.json",
 		save_interval: 10_000,
-		debug: true,
+		debug: false,
 	},
 };
