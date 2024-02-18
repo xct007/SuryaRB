@@ -68,7 +68,8 @@ export async function Handler(upsert, sock) {
 		feature.init();
 	}
 	if (message.isGroup) {
-		db.groups.set(message.chat);
+		const group = db.groups.set(message.chat);
+		group.name = groupMetadata.subject;
 	}
 	const user = db.users.set(message.sender);
 	user.name = message.pushName;
