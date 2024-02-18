@@ -96,3 +96,6 @@ export default {
 	// done: "Success %exec" // random if array
 };
 ```
+
+## Contributing
+You can contribute to the development of this project by submitting a pull request. If you find any bugs, please report them by creating an issue.
