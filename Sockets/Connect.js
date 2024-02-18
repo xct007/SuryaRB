@@ -94,5 +94,6 @@ async function connectToWhatsApp(use_pairing_code = Config.use_pairing_code) {
 		// only if store is present
 		return proto.Message.fromObject({});
 	}
+	return sock;
 }
 export default connectToWhatsApp;
