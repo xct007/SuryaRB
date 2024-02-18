@@ -1,9 +1,9 @@
-// File://home/rose/BOT/SuryaRB/Message/Features/recolor.js
+// File://home/rose/BOT/SuryaRB/Message/Features/ocr.js
 import { telegraph } from "../../Libs/Uploader.js";
 
 export default {
-	command: ["recolor", "warnain"],
-	description: "Recolor image.",
+	command: ["ocr"],
+	description: "Optical character recognition.",
 	category: "Image",
 	owner: false,
 	admin: false,
@@ -21,9 +21,8 @@ export default {
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
 		const url = await telegraph(buffer);
-		const { data } = await api.get("/image/recolor", {
-			url,
-            json: true
+		const { data } = await api.post("/image/ocr", {
+			init_image: url,
 		});
 
 		const { status, message, result } = data;
@@ -32,7 +31,7 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: Buffer.from(result.base64Image, "base64") }, { quoted: m })
+		await sock.sendMessage(m.chat, { text: result.text }, { quoted: m })
 
 	},
 	failed: "Failed to execute the %cmd command\n%error",

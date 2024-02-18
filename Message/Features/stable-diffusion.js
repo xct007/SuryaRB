@@ -1,6 +1,6 @@
 // File://home/rose/BOT/SuryaRB/Message/Features/stable-diffusion.js
 export default {
-	command: ["stablediff", "diffusion"],
+	command: ["stablediff"],
 	description: "Create image using diffusion.",
 	category: "Image",
 	owner: false,
