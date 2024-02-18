@@ -70,9 +70,9 @@ export function Messages(upsert, sock) {
 				m.mtype = getContentType(m.message);
 			}
 		}
-		m.contextInfo = m.message[m.mtype].contextInfo || {};
-		m.mentionedJid = m.message[m.mtype].contextInfo?.mentionedJid || [];
 		try {
+			m.contextInfo = m.message[m.mtype].contextInfo || {};
+			m.mentionedJid = m.message[m.mtype].contextInfo?.mentionedJid || [];
 			const quoted = m.contextInfo.quotedMessage || null;
 			if (quoted) {
 				if (quoted.ephemeralMessage) {
