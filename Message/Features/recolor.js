@@ -32,7 +32,7 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: Buffer.from(result.base64Image, 'base64') }, { quoted: m })
+		await sock.sendMessage(m.chat, { image: Buffer.from(result.base64Image, "base64") }, { quoted: m })
 
 	},
 	failed: "Failed to execute the %cmd command\n%error",
