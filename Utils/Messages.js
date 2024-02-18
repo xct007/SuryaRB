@@ -170,6 +170,6 @@ export function Messages(upsert, sock) {
 			console.error(error);
 		}
 	}
-	console.log(m);
+
 	return m;
 }
