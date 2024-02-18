@@ -71,7 +71,7 @@ export function Messages(upsert, sock) {
 			}
 		}
 		m.contextInfo = m.message[m.mtype].contextInfo || {};
-
+		m.mentionedJid = m.message[m.mtype].contextInfo?.mentionedJid || [];
 		try {
 			const quoted = m.contextInfo.quotedMessage || null;
 			if (quoted) {
@@ -100,6 +100,9 @@ export function Messages(upsert, sock) {
 					};
 				}
 				m.quoted.mtype = m.quoted.type = Object.keys(m.quoted.message)[0];
+				m.quoted.mentionedJid =
+					m.quoted.message[m.quoted.mtype].contextInfo?.mentionedJid || [];
+
 				m.quoted.text =
 					m.quoted.message?.conversation ||
 					m.quoted.message[m.quoted.mtype]?.text ||
