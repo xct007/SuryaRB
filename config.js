@@ -6,4 +6,10 @@ export const Config = {
 	pairing_wait: 1000 * 6,
 	prefix: ["!", "."],
 	itsrose_apikey: process.env.ITSROSE_APIKEY,
+
+	database: {
+		path: "./database.json",
+		save_interval: 10_000,
+		debug: true,
+	},
 };

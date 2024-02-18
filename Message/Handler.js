@@ -9,6 +9,23 @@ import { Prefix } from "../Utils/Prefix.js";
 import { Config } from "../config.js";
 import { Print } from "../Libs/Print.js";
 
+import db from "../Libs/Database.js";
+
+/**
+ * @typedef miscOptions - The misc options
+ * @property {string[]} args - The arguments
+ * @property {import("@whiskeysockets/baileys").WASocket} sock - The socket connection
+ * @property {import("@whiskeysockets/baileys").WASocket} conn - The socket connection (alias)
+ * @property {{get: (path: string, params?: any) => Promise<any>, post: (path: string, data?: any) => Promise<any>}} api - The API request
+ * @property {import("@whiskeysockets/baileys").GroupMetadata}
+ * @property {boolean} isOwner - If the user is the owner
+ * @property {boolean} isAdmin - If the user is the admin
+ * @property {string} command - The command
+ * @property {string} text - The text
+ * @property {string} usedPrefix - The used prefix
+ * @property {import("../Libs/Database").default} db - The database
+ */
+
 /**
  * Handles incoming messages
  * @param {import("@whiskeysockets/baileys").BaileysEventMap["messages.upsert"]} upsert - The upsert event
@@ -50,7 +67,11 @@ export async function Handler(upsert, sock) {
 	if (!feature.isInit) {
 		feature.init();
 	}
-
+	if (message.isGroup) {
+		db.groups.set(message.chat);
+	}
+	const user = db.users.set(message.sender);
+	user.name = message.pushName;
 	let executed_plugin = null;
 	try {
 		for (const name in feature.plugins) {
@@ -78,6 +99,7 @@ export async function Handler(upsert, sock) {
 				}
 				executed_plugin = plugin;
 				Queue.add(message.sender, executed_plugin);
+
 				const miscOptions = {
 					args,
 					sock,
@@ -89,6 +111,7 @@ export async function Handler(upsert, sock) {
 					command,
 					text,
 					usedPrefix,
+					db,
 				};
 				try {
 					// this is useless, but as you want

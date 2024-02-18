@@ -131,3 +131,4 @@ dist
 
 baileys*
 session.data.json
+database.json
