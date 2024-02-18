@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 import { fileTypeFromBuffer } from "file-type";
 import { Readable, Writable } from "stream";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, unlinkSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import crypto from "crypto";
@@ -17,17 +17,10 @@ class Sticker {
 	/**
 	 * Convert the media to webp.
 	 * @param {Buffer} mediaBuffer - The media buffer.
+	 * @param {string[]} args - The arguments for the ffmpeg process.
 	 * @returns {Promise<Buffer>} - The webp buffer.
 	 */
-	async convert(mediaBuffer) {
-		const fileType = await fileTypeFromBuffer(mediaBuffer);
-		if (!fileType) {
-			throw new Error("Invalid file type");
-		}
-
-		const args = fileType.mime.startsWith("image")
-			? outputOptionsArgs.image
-			: outputOptionsArgs.video;
+	async convert(mediaBuffer, args) {
 		const tempPath = join(tmpdir(), crypto.randomBytes(16).toString("hex"));
 		return new Promise((resolve, reject) => {
 			const stream = new Readable({
@@ -50,10 +43,11 @@ class Sticker {
 				.addOutputOptions(args)
 				.toFormat("webp")
 				.on("end", () => {
-					(existsSync(tempPath) &&
-						resolve(readFileSync(tempPath)) &&
-						unlinkSync(tempPath)) ||
-						reject("File not found");
+					if (existsSync(tempPath)) {
+						const buffer = readFileSync(tempPath);
+						unlinkSync(tempPath);
+						resolve(buffer);
+					}
 				})
 				.on("error", (err) => {
 					reject(err);
@@ -104,11 +98,20 @@ class Sticker {
 		mediaBuffer,
 		{ packname = this.packname, author = this.author, emojis = ["❤️"] }
 	) {
-		const webpBuffer = await this.convert(mediaBuffer);
+		const { mime } = (await fileTypeFromBuffer(mediaBuffer)) || {};
+		if (!mime) {
+			throw new Error("Invalid file type");
+		}
+
+		const args = mime.startsWith("image")
+			? outputOptionsArgs.image
+			: outputOptionsArgs.video;
+		const webpBuffer =
+			(!mime.includes("webp") && (await this.convert(mediaBuffer, args))) ||
+			mediaBuffer;
 		const image = new webp.Image();
 		await image.load(webpBuffer);
 		const exif = this.metadata(this.exif(packname, author, emojis));
-		console.log(exif);
 		image.exif = exif;
 		return await image.save(null);
 	}

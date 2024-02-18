@@ -21,7 +21,7 @@ export const outputOptionsArgs = {
 		"-ss",
 		"00:00:00",
 		"-t",
-		"00:00:05",
+		"00:00:20",
 		"-preset",
 		"default",
 		"-an",

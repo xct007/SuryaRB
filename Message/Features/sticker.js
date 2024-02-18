@@ -14,7 +14,8 @@ export default {
 	execute: async function (m, { sock }) {
 		const q = m.quoted ? m.quoted : m;
 		const mime = q.mtype || "";
-		if (!/webp|image|video|webm/g.test(mime)) {
+		if (!/sticker|webp|image|video|webm/g.test(mime)) {
+			console.log(mime);
 			return m.reply("Please reply/send a image with the command");
 		}
 		const image = await q.download();
