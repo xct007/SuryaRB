@@ -28,7 +28,9 @@ export async function Handler(upsert, sock) {
 		? message.text.slice(usedPrefix.length).split(/ +/).shift().toLowerCase()
 		: "";
 
-	const text = message?.text?.replace(usedPrefix + command, "").trim();
+	const text = message?.text
+		?.replace(new RegExp(`^${usedPrefix}${command}`, "i"), "")
+		.trim();
 	const args = text?.split(" ") || [];
 	const groupMetadata = message.isGroup
 		? await sock.groupMetadata(message.chat)
@@ -88,23 +90,23 @@ export async function Handler(upsert, sock) {
 				};
 				try {
 					// this is useless, but as you want
-					if (plugin.wait) {
-						const waitMessage = Array.isArray(plugin.wait)
-							? plugin.wait[Math.floor(Math.random() * plugin.wait.length)]
-							: plugin.wait;
+					// if (plugin.wait) {
+					// 	const waitMessage = Array.isArray(plugin.wait)
+					// 		? plugin.wait[Math.floor(Math.random() * plugin.wait.length)]
+					// 		: plugin.wait;
 
-						await sock.sendMessage(
-							message.chat,
-							{
-								text: waitMessage
-									.replace("%name", message.pushName)
-									.replace("%tag", "@" + message.sender.replace(/[^0-9]/g, ""))
-									.replace("%group", message.isGroup ? groupMetadata.subject : ""),
-								mentions: [message.sender],
-							},
-							{ quoted: message }
-						);
-					}
+					// 	await sock.sendMessage(
+					// 		message.chat,
+					// 		{
+					// 			text: waitMessage
+					// 				.replace("%name", message.pushName)
+					// 				.replace("%tag", "@" + message.sender.replace(/[^0-9]/g, ""))
+					// 				.replace("%group", message.isGroup ? groupMetadata.subject : ""),
+					// 			mentions: [message.sender],
+					// 		},
+					// 		{ quoted: message }
+					// 	);
+					// }
 					const old = performance.now();
 
 					// execute
