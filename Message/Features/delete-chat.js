@@ -8,7 +8,13 @@ export default {
 	admin: false,
 	hidden: false,
 	limit: 0,
+	group: false,
+	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions}
+	 */
 	execute: async function (m, { sock, isAdmin, isOwner, isBotAdmin }) {
 		if (m.quoted) {
 			if (m.isGroup && (isAdmin || isOwner) && isBotAdmin) {

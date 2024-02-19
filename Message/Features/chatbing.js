@@ -12,6 +12,10 @@ export default {
 	group: false,
 	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions}
+	 */
 	async execute(m, { sock, api, text }) {
 		if (!text) {
 			return m.reply("Need text.");
@@ -26,46 +30,47 @@ export default {
 			const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
 			initImage = await telegraph(buffer).catch(() => null);
 		}
+		m.replyUpdate("...", async (update) => {
+			const { data } = await api.post("/chatGPT/bing_chat", {
+				prompt: text,
+				init_image: initImage,
+				time_zone: "Asia/Jakarta",
+				tone: "Balanced",
+				strip_markdown: false,
+			});
 
-		const { data } = await api.post("/chatGPT/bing_chat", {
-			prompt: text,
-			init_image: initImage,
-			time_zone: "Asia/Jakarta",
-			tone: "Balanced",
-			strip_markdown: false,
-		});
+			const { status, message, result } = data;
 
-		const { status, message, result } = data;
-
-		if (!status) {
-			return m.reply(message);
-		}
-
-		const {
-			sources,
-			message: { content },
-			invocation,
-		} = result;
-
-		await sock.sendMessage(m.chat, { text: content }, { quoted: m });
-
-		if (invocation?.type === "image") {
-			try {
-				for (const url of invocation.images) {
-					await sock.sendMessage(
-						m.chat,
-						{
-							image: {
-								url,
-							},
-						},
-						{ quoted: m }
-					);
-				}
-			} catch (error) {
-				console.error(error);
+			if (!status) {
+				return update(message);
 			}
-		}
+
+			const {
+				sources,
+				message: { content },
+				invocation,
+			} = result;
+
+			update(content);
+
+			if (invocation?.type === "image") {
+				try {
+					for (const url of invocation.images) {
+						await sock.sendMessage(
+							m.chat,
+							{
+								image: {
+									url,
+								},
+							},
+							{ quoted: m }
+						);
+					}
+				} catch (error) {
+					console.error(error);
+				}
+			}
+		});
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",
