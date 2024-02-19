@@ -1,10 +1,11 @@
 <div align="center">
-    <h1 align="center">
-                SURYA </br> EXCLUSIVE
-        </h1>
-    <h3 align="center">
-                <u>PERFECTION REDEFINED</u>
-        </h3>
+    <h1>
+	    <i>SURYA</i> </br> EXCLUSIVE
+    </h1>
+    <h3>
+        ___________________________</br>
+        PERFECTION REDEFINED
+    </h3>
     <img src="https://i.pinimg.com/originals/df/f2/f5/dff2f59d1a0ad6e2b6556e3c43c1cf79.jpg" alt="Surya Exclusive MD"/>
 </div>
 
