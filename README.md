@@ -70,8 +70,44 @@ export default {
 			usedPrefix,
 		}
 	) {
-		// Logic
+		// Single reply
 		m.reply("Hello World");
+
+		// Single reply with fancy text
+		// 2nd parameter is the style of the text listed in Config/Fonts.js
+		m.reply("Hello World", "funky");
+
+		// Reply then update message
+		m.replyUpdate("previous message", async(update) => {
+			// do something
+			//...
+			// update the message
+			update("new message");
+		});
+
+		// react to the message
+		m.react("👍");
+
+		// delete the message (if the bot has the permission to do so)
+		m.delete();
+
+		// Download media (image, video, audio)
+		const media = m?.download?.().catch(() => null);
+		if (media) {
+			// Do something with the media buffer
+		}
+
+		// Make a request to the ITSROSE API (Axios instance)
+		// api.get() and api.post() are the same as axios.get() and axios.post()
+		// 1st parameter is the path to the endpoint (without the base URL)
+		// 2nd parameter is the request body or query parameters (optional)
+		// See Utils/ApiRequest.js for more information
+		const response = await api.get("/path/to/endpoint", { param: "value" });
+		if (response.data.status) {
+			// Do something with the response
+			const data = response.data;
+			m.reply(data);
+		}
 	},
 
 	// Message to display when the command execution fails
@@ -99,3 +135,9 @@ export default {
 
 ## Contributing
 You can contribute to the development of this project by submitting a pull request. If you find any bugs, please report them by creating an issue.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
+
+## Contributors
+[![](https://contrib.rocks/image?repo=xct007/SuryaRB)](https://github.com/xct007/SuryaRB/graphs/contributors)
