@@ -9,7 +9,7 @@ export default {
 	owner: false,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: false,
 	group: false,
 	private: false,
 

@@ -14,12 +14,12 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Creating features/plugins](#creating-featuresplugins)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contributors](#contributors)
+	- [Requirements](#requirements)
+	- [Installation](#installation)
+	- [Creating features/plugins](#creating-featuresplugins)
+	- [Contributing](#contributing)
+	- [License](#license)
+	- [Contributors](#contributors)
 
 ## Requirements
 
@@ -111,8 +111,9 @@ export default {
 	admin: false,
 	// If hidden, the command will not be shown in the menu
 	hidden: false,
-	// Not implemented yet
-	limit: 0,
+	// If true, user limit will be checked before executing the command
+	// If the limit is reached, the command will not be executed
+	limit: false,
 
 	// If true the command only can be call in group chat
 	group: false,

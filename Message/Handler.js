@@ -37,11 +37,11 @@ export async function Handler(upsert, sock) {
 	}
 
 	const message = Messages(upsert, sock);
-	if (!message) {
+	if (!message || message.sender === "status@broadcast") {
 		return;
 	}
 
-	const [isCommand, prefix] = Prefix(message.text);
+	const [isCommand] = Prefix(message.text);
 	const usedPrefix = isCommand ? message.text.split("")[0] : "";
 	const command = isCommand
 		? message.text.slice(usedPrefix.length).split(/ +/).shift().toLowerCase()
@@ -103,6 +103,17 @@ export async function Handler(upsert, sock) {
 					message.reply("This commnad only available in private chat");
 					return;
 				}
+
+				if (plugin.limit && !isOwner && !user.premium) {
+					if (user.limit < 0) {
+						message.reply("You have reached the limit of using this command");
+						return;
+					}
+					plugin.callback = () => {
+						user.limit--;
+					};
+				}
+
 				executed_plugin = plugin;
 				Queue.add(message.sender, executed_plugin);
 
@@ -141,7 +152,6 @@ export async function Handler(upsert, sock) {
 					// }
 					// const old = performance.now();
 
-					// execute
 					await plugin.execute(message, miscOptions);
 
 					// this is useless, but as you want

@@ -42,6 +42,7 @@
 		"dotenv": "^16.4.4",
 		"file-type": "^19.0.0",
 		"fluent-ffmpeg": "^2.1.2",
+		"import-from-string": "^0.0.4",
 		"jimp": "^0.16.13",
 		"link-preview-js": "^3.0.5",
 		"node-webpmux": "^3.2.0",

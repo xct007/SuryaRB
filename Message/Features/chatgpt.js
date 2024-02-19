@@ -5,7 +5,7 @@ export default {
 	owner: false,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: true,
 	group: false,
 	private: false,
 
@@ -14,10 +14,10 @@ export default {
 	 * @param {import("../Handler").miscOptions} options - The options.
 	 */
 	execute: async function (m, { sock, api, text }) {
+		if (!text) {
+			return m.reply("Please provide a prompt.");
+		}
 		m.replyUpdate("...", async (update) => {
-			if (!text) {
-				return update("Please provide a prompt.");
-			}
 			const { data } = await api.post("/chatGPT/completions", {
 				prompt: text,
 			});

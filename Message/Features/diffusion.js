@@ -8,11 +8,11 @@ export default {
 	owner: false,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: false,
 	group: false,
 	private: false,
 
-	async execute(m, { sock, api, text }) {
+	execute: async function (m, { sock, api, text }) {
 		if (!text) {
 			return m.reply("Need text.");
 		}

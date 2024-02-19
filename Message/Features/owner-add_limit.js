@@ -6,7 +6,7 @@ export default {
 	owner: true,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: false,
 	group: false,
 	private: false,
 
@@ -26,10 +26,24 @@ export default {
 		}
 		if (cmd === "add") {
 			user.limit += Number(number);
-			return m.reply(`Success added ${number} to ${who}'s limit`);
+			await sock.sendMessage(
+				m.chat,
+				{
+					text: `Success added ${number} to @${who.replace(/[^0-9]/g, "")}'s limit`,
+					mentions: [who],
+				},
+				{ quoted: m }
+			);
 		} else if (cmd == "reduce") {
 			user.limit -= Number(number);
-			return m.reply(`Success reduced ${number} from ${who}'s limit`);
+			await sock.sendMessage(
+				m.chat,
+				{
+					text: `Success reduced ${number} to @${who.replace(/[^0-9]/g, "")}'s limit`,
+					mentions: [who],
+				},
+				{ quoted: m }
+			);
 		}
 	},
 

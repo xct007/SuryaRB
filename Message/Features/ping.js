@@ -17,7 +17,7 @@ export default {
 	// If hidden, the command will not be shown in the menu
 	hidden: false,
 	// Not useful, but we'll keep it for now
-	limit: 0,
+	limit: false,
 
 	// If true the command only can be call in group chat
 	group: false,

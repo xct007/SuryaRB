@@ -8,7 +8,7 @@ export default {
 	owner: false,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: false,
 	group: false,
 	private: false,
 
@@ -18,47 +18,43 @@ export default {
 			return m.reply("Need url");
 		}
 
-		try {
-			const { data, headers } = await axios.get(url, {
-				responseType: "arraybuffer",
-			});
+		const { data, headers } = await axios.get(url, {
+			responseType: "arraybuffer",
+		});
 
-			if (!data || !headers) {
-				return m.reply("Failed to fetch the url");
-			}
+		if (!data || !headers) {
+			return m.reply("Failed to fetch the url");
+		}
 
-			const mediaMap = {
-				image: "image",
-				video: "video",
-				audio: "audio",
-			};
+		const mediaMap = {
+			image: "image",
+			video: "video",
+			audio: "audio",
+		};
 
-			function getContentType() {
-				for (const key in mediaMap) {
-					if (headers?.["content-type"]?.includes(mediaMap[key])) {
-						return key;
-					}
+		function getContentType() {
+			for (const key in mediaMap) {
+				if (headers?.["content-type"]?.includes(mediaMap[key])) {
+					return key;
 				}
-				return null;
 			}
+			return null;
+		}
 
-			const contentType = getContentType();
-			if (contentType) {
-				return sock.sendMessage(
-					m.chat,
-					{ [contentType]: Buffer.from(data) },
-					{ quoted: m }
-				);
-			}
-
+		const contentType = getContentType();
+		if (contentType) {
+			await sock.sendMessage(
+				m.chat,
+				{ [contentType]: Buffer.from(data) },
+				{ quoted: m }
+			);
+		} else {
 			try {
 				const json = JSON.parse(data.toString());
-				return m.reply(JSON.stringify(json, null, 2));
+				m.reply(JSON.stringify(json, null, 2));
 			} catch {
-				return m.reply(data.toString());
+				m.reply(data.toString());
 			}
-		} catch (error) {
-			return m.reply(`Failed to execute the command: ${error}`);
 		}
 	},
 

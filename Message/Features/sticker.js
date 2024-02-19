@@ -8,7 +8,7 @@ export default {
 	owner: false,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: false,
 
 	// we are know all of the parameters from the handler
 	execute: async function (m, { sock }) {

@@ -7,7 +7,7 @@ export default {
 	group: true,
 	admin: true,
 	hidden: false,
-	limit: 0,
+	limit: false,
 
 	execute: async function (m, { sock, groupMetadata }) {
 		const len = groupMetadata.participants.length;

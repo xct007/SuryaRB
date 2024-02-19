@@ -8,7 +8,7 @@ export default {
 	owner: false,
 	admin: false,
 	hidden: false,
-	limit: 0,
+	limit: false,
 
 	execute: async function (m, { sock }) {
 		const q = m.quoted ? m.quoted : m;
