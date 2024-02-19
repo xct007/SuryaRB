@@ -17,7 +17,7 @@ export default {
 		}
 		const { data } = await api.post("/image/stable/diffusion", {
 			prompt: text,
-			style: "realistic"
+			style: "realistic",
 		});
 		const { status, result, message } = data;
 
@@ -25,7 +25,11 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: { url: result.images } }, { quoted: m });
+		await sock.sendMessage(
+			m.chat,
+			{ image: { url: result.images } },
+			{ quoted: m }
+		);
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",

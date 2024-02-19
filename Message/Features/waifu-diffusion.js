@@ -16,10 +16,10 @@ export default {
 			return;
 		}
 		const { data } = await api.get("/image/anime/diffusion", {
-			prompt: text, 
+			prompt: text,
 			negative_prompt: "nsfw, blur",
 			width: 512,
-			height: 512
+			height: 512,
 		});
 		const { status, message, result } = data;
 
@@ -27,10 +27,14 @@ export default {
 			return m.reply(message);
 		}
 
-        const images = result.images;
-        const base64Image = images[0];
+		const images = result.images;
+		const base64Image = images[0];
 
-        await sock.sendMessage(m.chat, { image: Buffer.from(base64Image, "base64") }, { quoted: m });
+		await sock.sendMessage(
+			m.chat,
+			{ image: Buffer.from(base64Image, "base64") },
+			{ quoted: m }
+		);
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",

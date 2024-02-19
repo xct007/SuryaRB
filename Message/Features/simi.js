@@ -12,13 +12,21 @@ export default {
 
 	execute: async function (m, { sock, api, text }) {
 		if (!text) {
-			return sock.sendMessage(m.chat, { text: "Please provide a prompt." }, { quoted: m });
+			return sock.sendMessage(
+				m.chat,
+				{ text: "Please provide a prompt." },
+				{ quoted: m }
+			);
 		}
 
 		if (text.includes("teach")) {
 			const [_, ask, answer] = text.match(/teach\s+(.+)\s*\|\s*(.+)/);
 			if (!ask || !answer) {
-				return sock.sendMessage(m.chat, { text: "simi teach <ask> | <answer>" }, { quoted: m });
+				return sock.sendMessage(
+					m.chat,
+					{ text: "simi teach <ask> | <answer>" },
+					{ quoted: m }
+				);
 			}
 			const { data } = await api.post("/simsimi/teach", {
 				ask: ask.trim(),

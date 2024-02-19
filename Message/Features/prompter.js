@@ -22,7 +22,7 @@ export default {
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
 		const url = await telegraph(buffer);
 		const { data } = await api.get("/image/stable/prompter", {
-			url
+			url,
 		});
 
 		const { status, message, result } = data;
@@ -31,8 +31,7 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { text: result.prompt }, { quoted: m })
-
+		await sock.sendMessage(m.chat, { text: result.prompt }, { quoted: m });
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],

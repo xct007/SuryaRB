@@ -23,7 +23,7 @@ export default {
 		const url = await telegraph(buffer);
 		const { data } = await api.get("/image/recolor", {
 			url,
-            json: true
+			json: true,
 		});
 
 		const { status, message, result } = data;
@@ -32,8 +32,11 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: Buffer.from(result.base64Image, "base64") }, { quoted: m })
-
+		await sock.sendMessage(
+			m.chat,
+			{ image: Buffer.from(result.base64Image, "base64") },
+			{ quoted: m }
+		);
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],

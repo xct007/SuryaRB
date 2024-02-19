@@ -34,8 +34,11 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: { url: result.images } }, { quoted: m })
-
+		await sock.sendMessage(
+			m.chat,
+			{ image: { url: result.images } },
+			{ quoted: m }
+		);
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],

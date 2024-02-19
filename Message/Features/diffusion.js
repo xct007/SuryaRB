@@ -38,7 +38,7 @@ export default {
 			cfg: 7.5,
 			controlNet: "none",
 			image_num: 1,
-			steps: 25
+			steps: 25,
 		});
 
 		const { status, message, result } = data;
@@ -47,8 +47,11 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: { url: result.images } }, { quoted: m });
-
+		await sock.sendMessage(
+			m.chat,
+			{ image: { url: result.images } },
+			{ quoted: m }
+		);
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",

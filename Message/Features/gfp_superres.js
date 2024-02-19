@@ -24,7 +24,7 @@ export default {
 		const url = await telegraph(buffer);
 		const { data } = await api.post("/image/gfp_superres", {
 			init_image: url,
-			outscale
+			outscale,
 		});
 
 		const { status, message, result } = data;
@@ -33,8 +33,11 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { image: { url: result.images } }, { quoted: m })
-
+		await sock.sendMessage(
+			m.chat,
+			{ image: { url: result.images } },
+			{ quoted: m }
+		);
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],

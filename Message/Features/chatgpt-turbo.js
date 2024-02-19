@@ -19,21 +19,25 @@ export default {
 			model: "gpt-4-1106-preview",
 			max_tokens: 200,
 			messages: [
-			  {
-				role: "user",
-				content: text,
-			  },
+				{
+					role: "user",
+					content: text,
+				},
 			],
 			filter_messages: true,
-		  });
+		});
 
 		const { status, result, message } = data;
 
 		if (!status) {
 			return m.reply(message);
 		}
-		
-		await sock.sendMessage(m.chat, { text: result.messages.content }, { quoted: m });
+
+		await sock.sendMessage(
+			m.chat,
+			{ text: result.messages.content },
+			{ quoted: m }
+		);
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",

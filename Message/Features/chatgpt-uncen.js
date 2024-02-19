@@ -18,19 +18,19 @@ export default {
 		const { data } = await api.post("/chatGPT/uncen_chat", {
 			messages: [
 				{
-				  role: "user",
-				  content: text,
+					role: "user",
+					content: text,
 				},
-			  ],
-			  max_tokens: 1000,
-		  });
+			],
+			max_tokens: 1000,
+		});
 
 		const { status, result, message: error } = data;
 
 		if (!status) {
 			return m.reply(error);
 		}
-		
+
 		await sock.sendMessage(m.chat, { text: result.message }, { quoted: m });
 	},
 

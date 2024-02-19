@@ -31,8 +31,7 @@ export default {
 			return m.reply(message);
 		}
 
-		await sock.sendMessage(m.chat, { text: result.text }, { quoted: m })
-
+		await sock.sendMessage(m.chat, { text: result.text }, { quoted: m });
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],

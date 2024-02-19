@@ -33,7 +33,7 @@ export default {
 
 		await Promise.all(sendMessagePromises); // for waiting images
 	},
-	
+
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],
 	done: null,
