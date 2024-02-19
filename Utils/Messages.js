@@ -160,16 +160,18 @@ export function Messages(upsert, sock) {
 					{ text: String(text) },
 					{ quoted: m }
 				);
-				/**
-				 * @param {string} n_text - The new text to update the message.
-				 * @returns {void}
-				 */
-				cb((n_text) => {
-					sock.sendMessage(m.chat, {
-						text: n_text,
-						edit: response.key,
+				if (typeof cb === "function") {
+					/**
+					 * @param {string} n_text - The new text to update the message.
+					 * @returns {void}
+					 */
+					cb((n_text) => {
+						sock.sendMessage(m.chat, {
+							text: n_text,
+							edit: response.key,
+						});
 					});
-				});
+				}
 			};
 			m.delete = () => sock.sendMessage(m.chat, { delete: m.key });
 			m.download = (pathFile) => downloadMedia(m.message, pathFile);
