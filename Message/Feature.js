@@ -32,7 +32,6 @@ class Feature {
 	async parser(module, file) {
 		const keys = Object.keys(Features);
 		for (const key of keys) {
-			// if module doesn't have one of the keys, add it
 			if (!module[key]) {
 				Print.warn(`Feature ${file} is missing the ${key}`);
 			}
