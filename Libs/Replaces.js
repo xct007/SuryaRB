@@ -16,7 +16,7 @@ export default function Replace(str, fontName = "system") {
 	if (font) {
 		const system = FONTS.system;
 		for (let i = 0; i < system.length; i++) {
-			str = String(str).replace(new RegExp(system[i], "g"), font[i]);
+			str = String(str).replace(new RegExp(system[i], "gi"), font[i]);
 		}
 	}
 	return str;
