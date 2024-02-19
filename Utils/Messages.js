@@ -118,8 +118,9 @@ export function Messages(upsert, sock) {
 					"";
 				m.quoted.key = {
 					id: m.contextInfo.stanzaId,
-					fromMe: m.sender === jidNormalizedUser(sock.user.id),
-					remoteJid: m.sender,
+					fromMe: m.quoted.sender === jidNormalizedUser(sock.user.id),
+					remoteJid: m.chat,
+					...(m.isGroup ? { participant: m.contextInfo.participant } : {}),
 				};
 				m.quoted.react = (emoji) =>
 					sock.sendMessage(m.chat, {
@@ -167,7 +168,7 @@ export function Messages(upsert, sock) {
 					 */
 					cb((n_text) => {
 						sock.sendMessage(m.chat, {
-							text: n_text,
+							text: String(n_text),
 							edit: response.key,
 						});
 					});
