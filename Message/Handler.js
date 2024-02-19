@@ -62,7 +62,12 @@ export async function Handler(upsert, sock) {
 				.map((participant) => participant.id)
 				.includes(message.sender)
 		: false;
-
+	const isBotAdmin = message.isGroup
+		? groupMetadata.participants
+				.filter((participant) => participant.admin)
+				.map((participant) => participant.id)
+				.includes(sock.user.id)
+		: false;
 	const feature = Feature;
 	if (!feature.isInit) {
 		feature.init();
@@ -109,6 +114,7 @@ export async function Handler(upsert, sock) {
 					groupMetadata,
 					isOwner,
 					isAdmin,
+					isBotAdmin,
 					command,
 					text,
 					usedPrefix,
