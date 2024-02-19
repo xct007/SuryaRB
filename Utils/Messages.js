@@ -6,6 +6,7 @@ import {
 } from "@whiskeysockets/baileys";
 import fs from "node:fs/promises";
 
+import Replace from "../Libs/Replaces.js";
 import { mimeMap } from "./Medias.js";
 
 const downloadMedia = async (message, pathFile) => {
@@ -37,7 +38,7 @@ const downloadMedia = async (message, pathFile) => {
  * @property {import("@whiskeysockets/baileys").proto.IMessageContextInfo} contextInfo - The context info.
  * @property {import("@whiskeysockets/baileys").WAMessage} quoted - The quoted message.
  * @property {() => Promise<Buffer | null>} download - Download the media and return the buffer.
- * @property {(text: string) => void} reply - Reply to the message.
+ * @property {(text: string, font?: string) => void} reply - Reply to the message.
  * @property {(text: string, cb: (update: (n_text: string) => void) => void) => void} replyUpdate - Update the message with a new text.
  * @property {() => void} delete
  * @property {(emoji: string) => void} react
@@ -145,8 +146,14 @@ export function Messages(upsert, sock) {
 						key: m.key,
 					},
 				});
-			m.reply = (text) =>
-				sock.sendMessage(m.chat, { text: String(text) }, { quoted: m });
+			m.reply = (text, font) =>
+				sock.sendMessage(
+					m.chat,
+					{
+						text: (font && Replace(text, font)) || text,
+					},
+					{ quoted: m }
+				);
 			m.replyUpdate = async (text, cb) => {
 				const response = await sock.sendMessage(
 					m.chat,

@@ -16,17 +16,17 @@ export default {
 	 */
 	execute: async function (m, { sock, api, text }) {
 		if (!text) {
-			return;
+			return m.reply("Need Text", "funky");
 		}
-		await sock.sendPresenceUpdate(m.chat, "composing");
-
-		const { data } = await api.post("/cai/chat", {
-			character_id: "1cffd389-ecb5-4498-8780-a2734ceb5f14",
-			message: text,
-			enable_nsfw: false,
+		m.replyUpdate("...", async (update) => {
+			const { data } = await api.post("/cai/chat", {
+				character_id: "1cffd389-ecb5-4498-8780-a2734ceb5f14",
+				message: text,
+				enable_nsfw: false,
+			});
+			const { status, message, result } = data;
+			update(status ? result.message : message);
 		});
-		const { status, message, result } = data;
-		m.reply(status ? result.message : message);
 	},
 
 	failed: "Failed to execute the %cmd command\n\n%error",
