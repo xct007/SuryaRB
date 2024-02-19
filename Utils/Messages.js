@@ -39,7 +39,7 @@ const downloadMedia = async (message, pathFile) => {
  * @property {import("@whiskeysockets/baileys").WAMessage} quoted - The quoted message.
  * @property {() => Promise<Buffer | null>} download - Download the media and return the buffer.
  * @property {(text: string, font?: string) => void} reply - Reply to the message.
- * @property {(text: string, cb: (update: (n_text: string) => void) => void) => void} replyUpdate - Update the message with a new text.
+ * @property {Promise<(text: string, cb: (update: (n_text: string) => void) => void) => void>} replyUpdate - Update the message with a new text.
  * @property {() => void} delete
  * @property {(emoji: string) => void} react
  * @property {string[]} mentionedJid
