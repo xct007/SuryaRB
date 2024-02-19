@@ -13,9 +13,9 @@ instance.defaults.validateStatus = () => true;
 
 export const ApiRequest = {
 	async get(path, params) {
-		return instance.get(path, { params });
+		return instance.get(path, { params }).catch((e) => e?.response);
 	},
 	async post(path, data) {
-		return instance.post(path, data);
+		return instance.post(path, data).catch((e) => e?.response);
 	},
 };
