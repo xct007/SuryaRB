@@ -123,7 +123,7 @@ export function Messages(upsert, sock) {
 				};
 				m.quoted.react = (emoji) =>
 					sock.sendMessage(m.chat, {
-						reaction: {
+						react: {
 							text: String(emoji),
 							key: m.quoted.key,
 						},
@@ -141,7 +141,7 @@ export function Messages(upsert, sock) {
 				"";
 			m.react = (emoji) =>
 				sock.sendMessage(m.chat, {
-					reaction: {
+					react: {
 						text: String(emoji),
 						key: m.key,
 					},
@@ -179,6 +179,6 @@ export function Messages(upsert, sock) {
 			console.error(error);
 		}
 	}
-
+	sock.user.id = jidNormalizedUser(sock.user.id);
 	return m;
 }
