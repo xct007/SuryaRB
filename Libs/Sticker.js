@@ -1,6 +1,6 @@
 import ffmpeg from "fluent-ffmpeg";
 import { fileTypeFromBuffer } from "file-type";
-import { Readable, Writable } from "stream";
+import { Readable } from "stream";
 import { readFileSync, existsSync, unlinkSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
@@ -8,17 +8,26 @@ import crypto from "crypto";
 import webp from "node-webpmux";
 import { outputOptionsArgs } from "../Config/Sticker.js";
 
+/**
+ * Represents a Sticker object.
+ * @class
+ */
 class Sticker {
+	/**
+	 * Constructs a new Sticker object.
+	 * @constructor
+	 */
 	constructor() {
 		this.ffmpeg = ffmpeg;
 		this.packname = "Itsrose";
 		this.author = "Itsrose";
 	}
+
 	/**
-	 * Convert the media to webp.
-	 * @param {Buffer} mediaBuffer - The media buffer.
-	 * @param {string[]} args - The arguments for the ffmpeg process.
-	 * @returns {Promise<Buffer>} - The webp buffer.
+	 * Converts the media buffer to a webp format using ffmpeg.
+	 * @param {Buffer} mediaBuffer - The media buffer to convert.
+	 * @param {string[]} args - The additional arguments for ffmpeg.
+	 * @returns {Promise<Buffer>} - The converted media buffer.
 	 */
 	async convert(mediaBuffer, args) {
 		const tempPath = join(tmpdir(), crypto.randomBytes(16).toString("hex"));
@@ -29,14 +38,6 @@ class Sticker {
 					this.push(null);
 				},
 			});
-
-			// const buffers = [];
-			// const writable = new Writable({
-			// 	write(chunk, _encoding, callback) {
-			// 		buffers.push(chunk);
-			// 		callback();
-			// 	},
-			// });
 
 			const ffmpegProcess = ffmpeg()
 				.input(stream)
@@ -53,22 +54,13 @@ class Sticker {
 					reject(err);
 				});
 			ffmpegProcess.save(tempPath);
-
-			// Im struggling to implement this part. I will try to implement it later
-			// writable
-			// 	.on("data", (data) => {
-			// 		buffers.push(data);
-			// 	})
-			// 	.on("finish", () => {
-			// 		resolve(Buffer.concat(buffers));
-			// 	});
 		});
 	}
+
 	/**
-	 * Generate the metadata.
-	 * @param {Object} options - The options to be included in the metadata.
+	 * Generates the metadata for the sticker.
+	 * @param {Object} options - The options for the sticker metadata.
 	 * @returns {Buffer} - The metadata buffer.
-	 * @private
 	 */
 	metadata(options) {
 		const loadDataExif = Buffer.concat([
@@ -85,14 +77,15 @@ class Sticker {
 		);
 		return loadDataExif;
 	}
+
 	/**
-	 * Create a sticker from the media.
-	 * @param {Buffer} mediaBuffer - The media buffer.
-	 * @param {Object} options - The options to be included in the metadata.
-	 * @param {string} options.packname - The pack name.
-	 * @param {string} options.author - The author name.
-	 * @param {string | string[]} options.emojis - The emojis.
-	 * @returns {Promise<Buffer>} - The sticker buffer.
+	 * Creates a sticker from the media buffer.
+	 * @param {Buffer} mediaBuffer - The media buffer to create the sticker from.
+	 * @param {Object} options - The options for creating the sticker.
+	 * @param {string} options.packname - The pack name for the sticker.
+	 * @param {string} options.author - The author of the sticker.
+	 * @param {string[]} options.emojis - The emojis associated with the sticker.
+	 * @returns {Promise<Buffer>} - The created sticker buffer.
 	 */
 	async create(
 		mediaBuffer,
@@ -115,6 +108,14 @@ class Sticker {
 		image.exif = exif;
 		return await image.save(null);
 	}
+
+	/**
+	 * Generates the exif data for the sticker.
+	 * @param {string} packname - The pack name for the sticker.
+	 * @param {string} author - The author of the sticker.
+	 * @param {string[]} emojis - The emojis associated with the sticker.
+	 * @returns {Object} - The exif data object.
+	 */
 	exif(packname, author, emojis) {
 		return {
 			"sticker-pack-id":
