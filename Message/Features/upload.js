@@ -1,5 +1,5 @@
 // File://home/rose/BOT/SuryaRB/Message/Features/upload.js
-import { telegraph } from "../../Libs/Uploader.js";
+import uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["upload", "tourl"],
@@ -18,8 +18,15 @@ export default {
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
-		m.reply(url);
+		let result = "";
+		for (const provider of Object.values(uploader.providers)) {
+			try {
+				result += `${provider.constructor.name}: ${await provider.upload(buffer)}\n`;
+			} catch (error) {
+				console.error(error);
+			}
+		}
+		m.reply(result.trim());
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: null,
