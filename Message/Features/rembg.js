@@ -15,7 +15,7 @@ export default {
 	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
 	 * @param {import("../Handler").miscOptions} options - The options.
 	 */
-	execute: async function (m, { sock, text, api }) {
+	execute: async function (m, { sock, api }) {
 		const q = m.quoted ? m.quoted : m;
 		const mime = q.mtype || "";
 		if (!/image/g.test(mime)) {
