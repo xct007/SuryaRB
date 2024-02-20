@@ -41,15 +41,9 @@ export async function Handler(upsert, sock) {
 		return;
 	}
 
-	const [isCommand] = Prefix(message.text);
-	const usedPrefix = isCommand ? message.text.split("")[0] : "";
-	const command = isCommand
-		? message.text.slice(usedPrefix.length).split(/ +/).shift().toLowerCase()
-		: "";
-	const text = message?.text
-		?.replace(new RegExp(`^${usedPrefix}${command}`, "i"), "")
-		.trim();
+	const [command, text, usedPrefix] = Prefix(message.text);
 	const args = text?.split(" ").map((x) => x.trim()) || [];
+
 	const groupMetadata = message.isGroup
 		? await sock.groupMetadata(message.chat)
 		: {};
@@ -190,6 +184,6 @@ export async function Handler(upsert, sock) {
 In: ${message.isGroup ? groupMetadata.subject : "Private Chat"}
 Type: ${message.mtype}
 RawText: ${message.text}
-Command: ${isCommand ? command : "None"}
+Command: ${command ?? "No Command"}
 `);
 }
