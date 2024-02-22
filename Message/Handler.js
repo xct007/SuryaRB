@@ -67,7 +67,6 @@ export async function Handler(upsert, sock) {
 	if (!feature.isInit) {
 		feature.init();
 	}
-
 	if (BOT_SETTINGS.self && !isOwner) {
 		return;
 	}
@@ -130,6 +129,7 @@ export async function Handler(upsert, sock) {
 					text,
 					usedPrefix,
 					db,
+					feature: feature.plugins,
 				};
 				try {
 					// this is useless, but as you want

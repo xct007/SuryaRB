@@ -1,5 +1,4 @@
 // TODO: Implementer the new Feature class
-import Feature from "../Feature.js";
 
 export default {
 	command: ["menu"],
@@ -12,8 +11,9 @@ export default {
 	group: false,
 	private: false,
 
-	execute: async function (m, { sock, usedPrefix, isOwner, isAdmin }) {
-		const features = Feature.plugins;
+	execute: async function (m, { sock, usedPrefix, isOwner, isAdmin, feature }) {
+		console.log(Feature);
+		const features = feature;
 		const filterdHidden = Object.fromEntries(
 			Object.entries(features).filter(([_, feature]) => !feature.hidden)
 		);
