@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { Mutex } from "async-mutex";
 import { Config } from "../config.js";
-import { UserSchema, GroupSchema } from "../Config/Schema.js";
+import { UserSchema, GroupSchema, SettingsSchema } from "../Config/Schema.js";
 
 class Helper {
 	/**
@@ -96,6 +96,7 @@ class Database {
 	#data = {
 		users: {},
 		groups: {},
+		settings: {},
 	};
 
 	/**
@@ -129,8 +130,10 @@ class Database {
 		this.#data = JSON.parse(readFileSync(this.#path, "utf-8"));
 		this.#data.users = this.#data.users ?? {};
 		this.#data.groups = this.#data.groups ?? {};
+		this.#data.settings = this.#data.settings ?? {};
 		this.users = new Helper("users", this.#data.users, UserSchema);
 		this.groups = new Helper("group", this.#data.groups, GroupSchema);
+		this.settings = new Helper("settings", this.#data.settings, SettingsSchema);
 	}
 
 	/**

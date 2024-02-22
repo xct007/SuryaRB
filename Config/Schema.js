@@ -10,6 +10,10 @@ export const GroupSchema = {
 	banned: Boolean,
 };
 
+export const SettingsSchema = {
+	self: Boolean,
+};
+
 export const Features = {
 	command: Array,
 	description: String,

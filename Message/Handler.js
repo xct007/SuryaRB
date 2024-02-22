@@ -40,6 +40,7 @@ export async function Handler(upsert, sock) {
 	if (!message || message.sender === "status@broadcast") {
 		return;
 	}
+	const BOT_SETTINGS = db.settings.set(sock.user.id);
 
 	const [command, text, usedPrefix] = Prefix(message.text);
 	const args = text?.split(" ").map((x) => x.trim()) || [];
@@ -66,6 +67,11 @@ export async function Handler(upsert, sock) {
 	if (!feature.isInit) {
 		feature.init();
 	}
+
+	if (BOT_SETTINGS.self && !isOwner) {
+		return;
+	}
+
 	if (message.isGroup) {
 		const group = db.groups.set(message.chat);
 		group.name = groupMetadata.subject;
