@@ -1,4 +1,4 @@
-// FIle://home/rose/BOT/SuryaRB/Message/Features/menu.js
+// TODO: Implementer the new Feature class
 import Feature from "../Feature.js";
 
 export default {
