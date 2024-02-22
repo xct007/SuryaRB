@@ -1,4 +1,4 @@
-import { telegraph } from "../../Libs/Uploader.js";
+import uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["rembg"],
@@ -24,7 +24,7 @@ export default {
 
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
+		const url = await uploader.upload(buffer, "tmpfiles");
 
 		const { data } = await api.post("/image/rembg", {
 			init_image: url,
