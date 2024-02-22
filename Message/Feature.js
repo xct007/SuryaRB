@@ -62,7 +62,6 @@ class Feature {
 			const importedModule = (await import(`${filePath}?t=${timestamp}`)).default;
 			this.plugins[file] = await this.parser(importedModule, join(this.folder, file));
 			this.plugins[file].filePath = join(this.folder, file);
-			return importedModule;
 		} catch (error) {
 			Print.error(`Failed to import ${file}`);
 			console.error(error);
@@ -70,6 +69,9 @@ class Feature {
 	}
 
 	async init() {
+		if (this.isInit) {
+			return;
+		}
 		const files = this.read();
 
 		for (const file of files) {
