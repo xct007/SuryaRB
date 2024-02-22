@@ -4,7 +4,7 @@ export const Config = {
 	owners: ["628385818401"],
 	use_pairing_code: true,
 	pairing_wait: 1000 * 6,
-	prefix: ["!", "."],
+	prefix: ["!", ".", ""],
 	itsrose_apikey: process.env.ITSROSE_APIKEY,
 
 	database: {
