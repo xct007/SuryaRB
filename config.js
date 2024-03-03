@@ -5,7 +5,7 @@ export const Config = {
 	use_pairing_code: true,
 	pairing_wait: 1000 * 6,
 	prefix: ["!", ".", ""],
-	itsrose_apikey: process.env.ITSROSE_APIKEY,
+	itsrose_apikey: process.env.ITSROSE_APIKEY || "Trial_Account_10K",
 
 	database: {
 		path: "./database.json",
