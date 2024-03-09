@@ -23,7 +23,7 @@ export function Prefix(text) {
 	const prefixes = normalizePrefix(Config.prefix);
 
 	for (const prefix of prefixes) {
-		if (text.startsWith(prefix)) {
+		if (text?.startsWith(prefix)) {
 			const textWithoutPrefix = text.slice(prefix.length).trim();
 			const parts = textWithoutPrefix.split(" ");
 			const command = parts.shift();
