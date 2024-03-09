@@ -12,10 +12,11 @@ export default {
 	group: false,
 	private: false,
 
-	execute: async function (m, { sock, api, text }) {
-		if (!text) {
-			return m.reply("Need text.");
-		}
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
+	execute: async function (m, { sock, api, args }) {
 		const q = m.quoted ? m.quoted : m;
 		const mime = q.mtype || "";
 		if (!/image/g.test(mime)) {
@@ -23,17 +24,17 @@ export default {
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
-		const [style, prompt] = text.split(" ", 2);
-		if (!style || !prompt) {
-			return m.reply("Please provide both style and prompt.");
+		const url = await telegraph.upload(buffer);
+		const [style = "anime", ...prompt] = args;
+		if (!style) {
+			return m.reply("Please provide both style");
 		}
 		const { data } = await api.post("/image/turnMe", {
 			init_image: url,
 			style,
 			skin: "default",
-			image_num: 1,
-			prompt,
+			image_num: 4,
+			prompt: prompt.join(" "),
 			strength: 0.6,
 		});
 
@@ -50,12 +51,9 @@ export default {
 			}
 			return;
 		}
-
-		await sock.sendMessage(
-			m.chat,
-			{ image: { url: result.images } },
-			{ quoted: m }
-		);
+		for (const url of result.images) {
+			await sock.sendMessage(m.chat, { image: { url } }, { quoted: m });
+		}
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: ["Please wait %tag", "Hold on %tag, fetching response"],
