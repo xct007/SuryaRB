@@ -12,7 +12,6 @@ export default {
 	private: false,
 
 	execute: async function (m, { sock, usedPrefix, isOwner, isAdmin, feature }) {
-		console.log(Feature);
 		const features = feature;
 		const filterdHidden = Object.fromEntries(
 			Object.entries(features).filter(([_, feature]) => !feature.hidden)
