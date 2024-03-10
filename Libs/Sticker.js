@@ -2,11 +2,120 @@ import ffmpeg from "fluent-ffmpeg";
 import { fileTypeFromBuffer } from "file-type";
 import { Readable } from "stream";
 import { readFileSync, existsSync, unlinkSync } from "fs";
+import pixelWidth from "string-pixel-width";
+import gm from "gm";
 import { tmpdir } from "os";
 import { join } from "path";
 import crypto from "crypto";
 import webp from "node-webpmux";
 import { outputOptionsArgs } from "../Config/Sticker.js";
+
+/**
+ * Converts the media buffer to a webp format using ffmpeg.
+ * @param {Buffer} mediaBuffer - The media buffer to convert.
+ * @param {string[]} args - The additional arguments for ffmpeg.
+ * @param {string} format - The format to convert to (default: "webp").
+ * @returns {Promise<Buffer>} - The converted media buffer.
+ */
+async function convert(mediaBuffer, args, format = "webp") {
+	const tempPath = join(tmpdir(), crypto.randomBytes(16).toString("hex"));
+	return new Promise((resolve, reject) => {
+		const ffmpegProcess = ffmpeg()
+			.input(bufferToStream(mediaBuffer))
+			.addOutputOptions(args)
+			.toFormat(format)
+			.on("end", () => {
+				if (existsSync(tempPath)) {
+					const buffer = readFileSync(tempPath);
+					unlinkSync(tempPath);
+					resolve(buffer);
+				}
+			})
+			.on("error", (err) => {
+				reject(err);
+			});
+		ffmpegProcess.save(tempPath);
+	});
+}
+
+/**
+ * Converts the media buffer to a stream.
+ * @param {Buffer} buffer - The media buffer to convert.
+ * @returns {Readable} - The converted media stream.
+ * @private
+ */
+function bufferToStream(buffer) {
+	const stream = new Readable();
+	stream.push(buffer);
+	stream.push(null);
+	return stream;
+}
+
+/**
+ * Generates the metadata for the sticker.
+ * @param {Object} options - The options for the sticker metadata.
+ * @returns {Buffer} - The metadata buffer.
+ */
+function metadata(options) {
+	const loadDataExif = Buffer.concat([
+		Buffer.from([
+			0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00,
+		]),
+		Buffer.from(JSON.stringify(options), "utf-8"),
+	]);
+	loadDataExif.writeUIntLE(
+		Buffer.from(JSON.stringify(options), "utf-8").length,
+		14,
+		4
+	);
+	return loadDataExif;
+}
+
+/**
+ * Generates the exif data for the sticker.
+ * @param {string} packname - The pack name for the sticker.
+ * @param {string} author - The author of the sticker.
+ * @param {string[]} emojis - The emojis associated with the sticker.
+ * @returns {Object} - The exif data object.
+ */
+function exif(packname, author, emojis) {
+	return {
+		"sticker-pack-id":
+			"com.snowcorp.stickerly.android.stickercontentprovider b5e7275f-f1de-4137-961f-57becfad34f2",
+		"sticker-pack-name": packname,
+		"sticker-pack-publisher": author,
+		emojis: Array.isArray(emojis) ? emojis : [emojis],
+		"api-url": "https://api.itsrose.life",
+		"android-app-store-link":
+			"https://play.google.com/store/apps/details?id=com.snowcorp.stickerly.android",
+		"ios-app-store-link":
+			"https://play.google.com/store/apps/details?id=com.snowcorp.stickerly.android",
+	};
+}
+
+/**
+ * Gets the font size for the text.
+ * @param {string} text - The text to get the font size for.
+ * @param {number} width - The width of the sticker.
+ * @param {number} height - The height of the sticker.
+ * @returns {Object} - The font size and width of the text.
+ * @private
+ */
+function getFontSize(text, width, height) {
+	let fontSize = 100;
+	let textWidth = 0;
+
+	while (true) {
+		textWidth = pixelWidth(text, { size: fontSize, font: "impact" });
+		if (textWidth < width - 15 && fontSize < height / 10) {
+			break;
+		}
+		fontSize -= 2;
+	}
+
+	return { fontSize: fontSize, width: textWidth };
+}
 
 /**
  * Represents a Sticker object.
@@ -21,61 +130,6 @@ class Sticker {
 		this.ffmpeg = ffmpeg;
 		this.packname = "Itsrose";
 		this.author = "Itsrose";
-	}
-
-	/**
-	 * Converts the media buffer to a webp format using ffmpeg.
-	 * @param {Buffer} mediaBuffer - The media buffer to convert.
-	 * @param {string[]} args - The additional arguments for ffmpeg.
-	 * @returns {Promise<Buffer>} - The converted media buffer.
-	 */
-	async convert(mediaBuffer, args) {
-		const tempPath = join(tmpdir(), crypto.randomBytes(16).toString("hex"));
-		return new Promise((resolve, reject) => {
-			const stream = new Readable({
-				read() {
-					this.push(mediaBuffer);
-					this.push(null);
-				},
-			});
-
-			const ffmpegProcess = ffmpeg()
-				.input(stream)
-				.addOutputOptions(args)
-				.toFormat("webp")
-				.on("end", () => {
-					if (existsSync(tempPath)) {
-						const buffer = readFileSync(tempPath);
-						unlinkSync(tempPath);
-						resolve(buffer);
-					}
-				})
-				.on("error", (err) => {
-					reject(err);
-				});
-			ffmpegProcess.save(tempPath);
-		});
-	}
-
-	/**
-	 * Generates the metadata for the sticker.
-	 * @param {Object} options - The options for the sticker metadata.
-	 * @returns {Buffer} - The metadata buffer.
-	 */
-	metadata(options) {
-		const loadDataExif = Buffer.concat([
-			Buffer.from([
-				0x49, 0x49, 0x2a, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00,
-			]),
-			Buffer.from(JSON.stringify(options), "utf-8"),
-		]);
-		loadDataExif.writeUIntLE(
-			Buffer.from(JSON.stringify(options), "utf-8").length,
-			14,
-			4
-		);
-		return loadDataExif;
 	}
 
 	/**
@@ -96,39 +150,61 @@ class Sticker {
 			throw new Error("Invalid file type");
 		}
 
-		const args = mime.startsWith("image")
+		const args = mime.includes("image")
 			? outputOptionsArgs.image
 			: outputOptionsArgs.video;
 		const webpBuffer =
-			(!mime.includes("webp") && (await this.convert(mediaBuffer, args))) ||
-			mediaBuffer;
+			(!mime.includes("webp") && (await convert(mediaBuffer, args))) || mediaBuffer;
 		const image = new webp.Image();
 		await image.load(webpBuffer);
-		const exif = this.metadata(this.exif(packname, author, emojis));
-		image.exif = exif;
+		const exifData = metadata(exif(packname, author, emojis));
+		image.exif = exifData;
 		return await image.save(null);
 	}
 
 	/**
-	 * Generates the exif data for the sticker.
-	 * @param {string} packname - The pack name for the sticker.
-	 * @param {string} author - The author of the sticker.
-	 * @param {string[]} emojis - The emojis associated with the sticker.
-	 * @returns {Object} - The exif data object.
+	 * Adds text to the sticker like a meme.
+	 * @param {Buffer} stickerBuffer - The sticker buffer to add text to.
+	 * @param {string} upperText - The upper text to add to the sticker.
+	 * @param {string} bottomText - The bottom text to add to the sticker.
+	 * @returns {Promise<Buffer>} - The sticker buffer with the added text.
 	 */
-	exif(packname, author, emojis) {
-		return {
-			"sticker-pack-id":
-				"com.snowcorp.stickerly.android.stickercontentprovider b5e7275f-f1de-4137-961f-57becfad34f2",
-			"sticker-pack-name": packname,
-			"sticker-pack-publisher": author,
-			emojis: Array.isArray(emojis) ? emojis : [emojis],
-			"api-url": "https://api.itsrose.life",
-			"android-app-store-link":
-				"https://play.google.com/store/apps/details?id=com.snowcorp.stickerly.android",
-			"ios-app-store-link":
-				"https://play.google.com/store/apps/details?id=com.snowcorp.stickerly.android",
-		};
+	async stickerMeme(stickerBuffer, upperText = "", bottomText = "") {
+		const tempPath = join(
+			tmpdir(),
+			crypto.randomBytes(16).toString("hex") + ".webp"
+		);
+		return new Promise((resolve, reject) => {
+			gm(stickerBuffer).size((err, size) => {
+				if (err) {
+					reject(err);
+				}
+				const width = size.width;
+				const height = size.height;
+
+				const topFontSize = getFontSize(upperText, width, height);
+				const bottomFontSize = getFontSize(bottomText, width, height);
+				gm(stickerBuffer)
+					.coalesce()
+					.font("./impact.ttf")
+					.stroke("#000000")
+					.fill("#ffffff")
+					.fontSize(topFontSize.fontSize)
+					.strokeWidth(1.5)
+					.drawText(0, 15, upperText, "North")
+					.fontSize(bottomFontSize.fontSize)
+					.drawText(0, height - 15 - bottomFontSize.fontSize, bottomText, "North")
+					.write(tempPath, (err) => {
+						if (err) {
+							reject(err);
+						} else {
+							const buffer = readFileSync(tempPath);
+							unlinkSync(tempPath);
+							resolve(buffer);
+						}
+					});
+			});
+		});
 	}
 }
 
