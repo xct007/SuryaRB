@@ -19,7 +19,7 @@ function normalizePrefix(prefix) {
  * @param {string} text - The text to extract the command from.
  * @returns {[string, string, string]} - An array containing the command, arguments, and prefix.
  */
-export function Prefix(text) {
+export function Prefix(text = "") {
 	const prefixes = normalizePrefix(Config.prefix);
 
 	for (const prefix of prefixes) {

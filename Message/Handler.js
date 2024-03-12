@@ -81,7 +81,11 @@ export async function Handler(upsert, sock) {
 	try {
 		for (const name in feature.plugins) {
 			const plugin = feature.plugins[name];
-			if (plugin?.command.includes(command)) {
+			if (
+				plugin?.command
+					?.map((s) => s.toLowerCase())
+					.includes(command.toLocaleLowerCase())
+			) {
 				if (Queue.exist(message.sender, plugin)) {
 					message.reply("You are still using this command");
 					return;

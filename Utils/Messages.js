@@ -76,8 +76,9 @@ export function Messages(upsert, sock) {
 			}
 		}
 		try {
-			m.contextInfo = m.message[m.mtype].contextInfo || {};
-			m.mentionedJid = m.message[m.mtype].contextInfo?.mentionedJid || [];
+			m.contextInfo = m.message[m.mtype]?.contextInfo || {};
+			m.mentionedJid = m.contextInfo?.mentionedJid || [];
+			m.mentionMe = m.mentionedJid[0] === sock.user.id;
 			const quoted = m.contextInfo.quotedMessage || null;
 			if (quoted) {
 				if (quoted.ephemeralMessage) {
@@ -86,6 +87,11 @@ export function Messages(upsert, sock) {
 						m.quoted = {
 							participant: jidNormalizedUser(m.contextInfo.participant),
 							message: quoted.ephemeralMessage.message.viewOnceMessage.message,
+						};
+					} else if (tipe === "protocolMessage") {
+						m.quoted = {
+							participant: jidNormalizedUser(m.contextInfo.participant),
+							message: quoted.ephemeralMessage.message.protocolMessage.message,
 						};
 					} else if (tipe === "viewOnceMessageV2") {
 						m.quoted = {
