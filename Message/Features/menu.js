@@ -11,12 +11,21 @@ export default {
 	group: false,
 	private: false,
 
-	execute: async function (m, { sock, usedPrefix, isOwner, isAdmin, feature }) {
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
+	execute: async function (
+		m,
+		{ sock, text, usedPrefix, isOwner, isAdmin, feature }
+	) {
+		const c = text?.toLowerCase() ?? "";
+
 		const features = feature;
-		const filterdHidden = Object.fromEntries(
+		const filterded = Object.fromEntries(
 			Object.entries(features).filter(([_, feature]) => !feature.hidden)
 		);
-		const plugins = Object.entries(filterdHidden).reduce((acc, [key, value]) => {
+		const plugins = Object.entries(filterded).reduce((acc, [key, value]) => {
 			const category = value.category?.trim() || "Unknown";
 			acc[category] = acc[category] || [];
 			acc[category].push(value);
@@ -25,22 +34,40 @@ export default {
 		const categories = Object.keys(plugins).sort();
 		let message = "";
 		for (const category of categories) {
-			message += `\`\`\`[ ${category} ]\`\`\`\n`;
+			if (c && category?.toLowerCase() !== c) {
+				continue;
+			}
+			message += `\`[ ${category} ]\`\n`;
 			for (const plugin of plugins[category]) {
 				const command = Array.isArray(plugin.command)
 					? plugin.command[0]
 					: plugin.command;
-				const aliases =
-					(Array.isArray(plugin.command) ? plugin.command.slice(1).join(", ") : null) ||
-					"-";
+
+				// command
 				message +=
 					((plugin.owner && !isOwner) || (plugin.admin && !isAdmin)
-						? `~${usedPrefix + command}~`
-						: `\`${usedPrefix + command}\``) + "\n";
-				message += `↳ ${plugin.description}\n`;
-				message += `↳ Aliases: ${aliases}\n`;
+						? `*~${usedPrefix + command}~*`
+						: `*${usedPrefix + command}*`) + "\n";
+
+				// description
+				message += `> ${plugin.description}\n`;
+
+				// aliases
+				const aliases =
+					(Array.isArray(plugin.command) ? plugin.command.slice(1).join(", ") : null) ||
+					null;
+				if (aliases) {
+					message += `> Aliases: ${aliases}\n`;
+				}
 			}
 		}
+
+		// if no command found for category
+		if (!message && c) {
+			message = `No command found for category \`${c}\``;
+		}
+
+		// send the message
 		m.reply(message.trim());
 	},
 
