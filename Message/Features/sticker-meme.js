@@ -1,5 +1,5 @@
 // File://home/rose/BOT/SuryaRB/Message/Features/sticker-meme.js
-import { telegraph } from "../../Libs/Uploader.js";
+import Uploader from "../../Libs/Uploader.js";
 import Sticker from "../../Libs/Sticker.js";
 
 export default {
@@ -25,7 +25,7 @@ export default {
 			.map((text) => text.trim());
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
+		const url = await Uploader.providers.tmpfiles.upload(buffer);
 		const { data } = await api.post("/canvas/memegen", {
 			init_image: url,
 			top: teks1,
