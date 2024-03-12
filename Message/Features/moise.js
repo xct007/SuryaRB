@@ -49,7 +49,7 @@ export default {
 		let statusData;
 		do {
 			statusData = await pullStatus();
-			await new Promise((resolve) => setTimeout(resolve, 5 * 1000));
+			await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
 		} while (statusData?.result.status !== "done");
 
 		const { audios } = statusData.result;
