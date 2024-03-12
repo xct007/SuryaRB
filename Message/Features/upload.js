@@ -3,7 +3,7 @@ import uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["upload", "tourl"],
-	description: "Upload a file to telegra.ph",
+	description: "Upload a file",
 	category: "Utility",
 	owner: false,
 	admin: false,
