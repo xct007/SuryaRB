@@ -1,5 +1,5 @@
 // File: /home/rose/BOT/SuryaRB/Message/Features/turnMe.js
-import { telegraph } from "../../Libs/Uploader.js";
+import Uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["turnme"],
@@ -24,7 +24,7 @@ export default {
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph.upload(buffer);
+		const url = await Uploader.providers.telegraph.upload(buffer);
 		const [style = "anime", ...prompt] = args;
 		if (!style) {
 			return m.reply("Please provide both style");

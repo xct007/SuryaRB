@@ -1,5 +1,5 @@
 // File://home/rose/BOT/SuryaRB/Message/Features/prompter.js
-import { telegraph } from "../../Libs/Uploader.js";
+import Uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["prompter", "prompt"],
@@ -20,7 +20,7 @@ export default {
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
+		const url = await Uploader.providers.telegraph.upload(buffer);
 		const { data } = await api.get("/image/stable/prompter", {
 			url,
 		});

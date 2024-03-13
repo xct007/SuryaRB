@@ -1,8 +1,8 @@
 import Uploader from "../../Libs/Uploader.js";
 
 export default {
-  command: ["diffusion", "diff"],
-  description: "All in One Diffusion.",
+  command: ["outpainting"],
+  description: "Image diffusion using outpainting.",
   category: "Image",
   owner: false,
   admin: false,
@@ -11,38 +11,28 @@ export default {
   group: false,
   private: false,
 
-  execute: async function (m, { sock, api, text }) {
-    if (!text) {
-      m.reply("Please provide a prompt.");
-      return;
-    }
+  execute: async function (m, { sock, api, args }) {
     const q = m.quoted ? m.quoted : m;
     const mime = q.mtype || "";
     if (!/image/g.test(mime)) {
       return m.reply("Please reply/send a image with the command");
     }
+    const prompt = args.join(" ");
     const media = await q.download();
     const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
     const url = await Uploader.providers.telegraph.upload(buffer);
+
     m.replyUpdate("...", async (update) => {
-      const { data } = await api.post("/image/diffusion", {
-        prompt: text,
-        negative_prompt: "nsfw, blur",
-        sampler: "Euler a",
-        seed: -1,
-        ratio: "1:1",
-        style: "ACG",
+      const { data } = await api.post("/image/outpainting", {
+        prompt,
+        type: "url|base64",
         init_image: url,
-        cfg: 7.5,
-        controlNet: "none",
-        image_num: 1,
-        steps: 25,
       });
 
-      const { status, message, result } = data;
+      const { status, result, message } = data;
 
       if (!status) {
-        return m.reply(message);
+        return update(message);
       }
 
       let metadataText = "";
@@ -51,11 +41,14 @@ export default {
           metadataText += `*${key}*: ${result.metadata[key]}\n`;
         }
       }
-      update(metadataText.trim());
+      update(metadataText);
+
+      const images = result.images;
+      const base64Image = images[0];
 
       await sock.sendMessage(
         m.chat,
-        { image: { url: result.images } },
+        { image: Buffer.from(base64Image, "base64") },
         { quoted: m },
       );
     });

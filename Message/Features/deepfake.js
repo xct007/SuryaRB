@@ -1,5 +1,4 @@
-// File: Message/Features/deepfake.js
-import { telegraph } from "../../Libs/Uploader.js";
+import Uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["deepfake"],
@@ -21,7 +20,7 @@ export default {
 		const style = args[0] || "wednesday";
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
+		const url = await Uploader.providers.telegraph.upload(buffer);
 		const { data } = await api.post("/deep_fake/video", {
 			init_image: url,
 			style,

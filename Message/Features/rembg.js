@@ -1,4 +1,4 @@
-import uploader from "../../Libs/Uploader.js";
+import Uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["rembg"],
@@ -24,7 +24,7 @@ export default {
 
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await uploader.upload(buffer, "tmpfiles");
+		const url = await Uploader.providers.tmpfiles.upload(buffer);
 
 		const { data } = await api.post("/image/rembg", {
 			init_image: url,

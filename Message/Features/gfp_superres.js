@@ -1,5 +1,5 @@
 // File://home/rose/BOT/SuryaRB/Message/Features/gfp_superres.js
-import { telegraph } from "../../Libs/Uploader.js";
+import Uploader from "../../Libs/Uploader.js";
 
 export default {
 	command: ["gfp_superres", "gfpsuper"],
@@ -21,7 +21,7 @@ export default {
 		const outscale = args[0] || 5; // default is 5 (if u without using value), usage: gfpsuper <value>
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await telegraph(buffer);
+		const url = await Uploader.providers.telegraph.upload(buffer);
 		const { data } = await api.post("/image/gfp_superres", {
 			init_image: url,
 			outscale,
