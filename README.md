@@ -14,12 +14,12 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-	- [Requirements](#requirements)
-	- [Installation](#installation)
-	- [Creating features/plugins](#creating-featuresplugins)
-	- [Contributing](#contributing)
-	- [License](#license)
-	- [Contributors](#contributors)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Creating features/plugins](#creating-featuresplugins)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contributors](#contributors)
 
 ## Requirements
 
@@ -207,6 +207,14 @@ export default {
 ## Contributing
 
 You can contribute to the development of this project by submitting a pull request. If you find any bugs, please report them by creating an issue.
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/feature-name`)
+3. Make your changes
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin feature/feature-name`)
+6. Create a new Pull Request
+7. Get your PR reviewed and merged
 
 ## License
 
