@@ -1,5 +1,6 @@
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import { Mutex } from "async-mutex";
+import mongoose from "mongoose";
 import { Config } from "../config.js";
 import { UserSchema, GroupSchema, SettingsSchema } from "../Config/Schema.js";
 
@@ -18,7 +19,7 @@ class Helper {
 	 * Retrieves the value associated with the specified key from the database.
 	 * If the key doesn't exist, it creates a new object for the key from the schema.
 	 * @param {string} key - The key to retrieve the value for.
-	 * @returns {UserSchema | GroupSchema | null} The value associated with the key.
+	 * @returns {UserSchema | GroupSchema | SettingsSchema | null} The value associated with the key.
 	 */
 	get(key) {
 		return this[this.name][key] ?? null;
@@ -85,6 +86,12 @@ class Helper {
 class Database {
 	/**
 	 * @private
+	 * @type {boolean}
+	 */
+	#initialized = false;
+
+	/**
+	 * @private
 	 * @type {string}
 	 */
 	#path = Config?.database?.path ?? "./database.json";
@@ -111,29 +118,62 @@ class Database {
 	 * @returns {Database} An instance of the Database class.
 	 */
 	constructor() {
+		this._model = null;
 		this.initialize();
 		setInterval(() => {
 			this.#write();
-			!Config?.database?.debug || console.log("Database saved");
 		}, Config?.database?.save_interval ?? 10_000);
 	}
 
 	/**
-	 * Initializes the database by creating an empty JSON file if it doesn't exist or if the existing file is not valid JSON.
+	 * Initializes the database.
 	 * @private
 	 * @returns {void}
 	 */
-	initialize() {
+	async initialize() {
+		if (this.#initialized) {
+			return;
+		}
+		if (Config?.database?.use_mongo) {
+			await this.initializeMongoDB();
+		}
 		if (!existsSync(this.#path) || !this.isValidJsonFile()) {
-			this.createEmptyJsonFile();
+			await this.createJsonFile();
 		}
 		this.#data = JSON.parse(readFileSync(this.#path, "utf-8"));
 		this.#data.users = this.#data.users ?? {};
 		this.#data.groups = this.#data.groups ?? {};
 		this.#data.settings = this.#data.settings ?? {};
+
 		this.users = new Helper("users", this.#data.users, UserSchema);
 		this.groups = new Helper("group", this.#data.groups, GroupSchema);
 		this.settings = new Helper("settings", this.#data.settings, SettingsSchema);
+
+		this.#initialized = true;
+	}
+
+	/**
+	 * Initializes the MongoDB database.
+	 * @private
+	 * @returns {Promise<void>}
+	 * @throws {Error} If an error occurs while initializing the MongoDB database.
+	 */
+	async initializeMongoDB() {
+		try {
+			await mongoose.connect(Config.database.mongo_url, {
+				useNewUrlParser: true,
+				useUnifiedTopology: true,
+			});
+			const DataSchema = new mongoose.Schema({
+				users: Object,
+				groups: Object,
+				settings: Object,
+			});
+
+			this._model = mongoose.model("data", DataSchema);
+		} catch (e) {
+			throw new Error(e);
+		}
 	}
 
 	/**
@@ -153,9 +193,16 @@ class Database {
 	/**
 	 * Creates an empty JSON file.
 	 * @private
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
-	createEmptyJsonFile() {
+	async createJsonFile() {
+		if (Config?.database?.use_mongo && this._model) {
+			const data = await this._model.findOne();
+			if (data) {
+				writeFileSync(this.#path, JSON.stringify(data, null, 2));
+				return;
+			}
+		}
 		writeFileSync(this.#path, JSON.stringify({}));
 	}
 
@@ -165,8 +212,20 @@ class Database {
 	 * @returns {void}
 	 */
 	#write() {
-		this.#mutex.runExclusive(() => {
-			writeFileSync(this.#path, JSON.stringify(this.#data, null, 2));
+		this.#mutex.runExclusive(async () => {
+			Config?.database?.debug && console.log("Saving database...");
+			try {
+				if (Config?.database?.use_mongo) {
+					if (this._model) {
+						await this._model.updateOne({}, this.#data, { upsert: true });
+					}
+				}
+				writeFileSync(this.#path, JSON.stringify(this.#data, null, 2));
+			} catch (e) {
+				console.error(e);
+			} finally {
+				this.#mutex.release();
+			}
 		});
 	}
 }
