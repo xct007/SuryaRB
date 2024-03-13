@@ -166,13 +166,7 @@ class Database {
 	 */
 	#write() {
 		this.#mutex.runExclusive(() => {
-			try {
-				writeFileSync(this.#path, JSON.stringify(this.#data, null, 2));
-			} catch (e) {
-				console.error(e);
-			} finally {
-				this.#mutex.release();
-			}
+			writeFileSync(this.#path, JSON.stringify(this.#data, null, 2));
 		});
 	}
 }
