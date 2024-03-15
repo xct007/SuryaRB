@@ -5,26 +5,7 @@ import fetch from "node-fetch";
 class Y2Mate {
 	constructor() {
 		this.baseURL = "https://www.y2mate.com";
-		this.headers = {
-			accept: "*/*",
-			"accept-language": "en-US,en;q=0.9,id;q=0.8,en-GB;q=0.7,en-GB-oxendict;q=0.6",
-			"cache-control": "no-cache",
-			pragma: "no-cache",
-			"sec-ch-ua":
-				'"Not A(Brand";v="99", "Microsoft Edge";v="121", "Chromium";v="121"',
-			"sec-ch-ua-mobile": "?0",
-			"sec-ch-ua-platform": '"Windows"',
-			"sec-fetch-dest": "empty",
-			"sec-fetch-mode": "cors",
-			"sec-fetch-site": "same-origin",
-			"sec-gpc": "1",
-			"x-requested-with": "XMLHttpRequest",
-			Referer: "https://www.y2mate.com/en900",
-			"Referrer-Policy": "strict-origin-when-cross-origin",
-		};
-		this.mapTypes = ["mp3", "360p", "480p", "720p", "1080p"];
 	}
-
 	#filter(obj) {
 		const filtered = {};
 		for (const key in obj) {
@@ -56,11 +37,13 @@ class Y2Mate {
 		const data = await resp.json();
 		return data;
 	}
+
 	async #_toBuffer(url) {
 		const resp = await fetch(url);
 		const buffer = await resp.buffer();
 		return buffer;
 	}
+
 	async info(url) {
 		const resp = await fetch("https://www.y2mate.com/mates/analyzeV2/ajax", {
 			headers: {
@@ -101,6 +84,37 @@ class Y2Mate {
 			author,
 			urls: filter,
 		};
+	}
+
+	get headers() {
+		return {
+			accept: "*/*",
+			"accept-language": "en-US,en;q=0.9,id;q=0.8,en-GB;q=0.7,en-GB-oxendict;q=0.6",
+			"cache-control": "no-cache",
+			"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+			pragma: "no-cache",
+			"sec-ch-ua":
+				'"Not A(Brand";v="99", "Microsoft Edge";v="121", "Chromium";v="121"',
+			"sec-ch-ua-arch": '"x86"',
+			"sec-ch-ua-bitness": '"64"',
+			"sec-ch-ua-full-version": '"121.0.2277.128"',
+			"sec-ch-ua-full-version-list":
+				'"Not A(Brand";v="99.0.0.0", "Microsoft Edge";v="121.0.2277.128", "Chromium";v="121.0.6167.184"',
+			"sec-ch-ua-mobile": "?0",
+			"sec-ch-ua-model": '""',
+			"sec-ch-ua-platform": '"Windows"',
+			"sec-ch-ua-platform-version": '"15.0.0"',
+			"sec-fetch-dest": "empty",
+			"sec-fetch-mode": "cors",
+			"sec-fetch-site": "same-origin",
+			"sec-gpc": "1",
+			"x-requested-with": "XMLHttpRequest",
+			Referer: "https://www.y2mate.com/",
+			"Referrer-Policy": "strict-origin-when-cross-origin",
+		};
+	}
+	get mapTypes() {
+		return ["mp3", "360p", "480p", "720p", "1080p"];
 	}
 }
 export default new Y2Mate();

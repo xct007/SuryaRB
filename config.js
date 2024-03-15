@@ -8,6 +8,9 @@ export const Config = {
 	itsrose_apikey: process.env.ITSROSE_APIKEY || "Trial_Account_10K",
 
 	database: {
+		use_mongo: true,
+		mongo_url: "mongodb://localhost:27017/database",
+
 		path: "./database.json",
 		save_interval: 10_000,
 		debug: false,
