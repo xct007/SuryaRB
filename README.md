@@ -14,12 +14,12 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Creating features/plugins](#creating-featuresplugins)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contributors](#contributors)
+	- [Requirements](#requirements)
+	- [Installation](#installation)
+	- [Creating features/plugins](#creating-featuresplugins)
+	- [Contributing](#contributing)
+	- [License](#license)
+	- [Contributors](#contributors)
 
 ## Requirements
 
@@ -68,6 +68,10 @@
 
    	// Database settings
    	database: {
+   		// use mongo or not
+   		use_mongo: true,
+   		mongo_url: "mongodb://localhost:27017/database",
+
    		// Path to the database file
    		path: "./database.json",
 
