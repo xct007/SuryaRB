@@ -46,9 +46,10 @@ async function connectToWhatsApp(use_pairing_code = Config.use_pairing_code) {
 		Config.phone_number &&
 		!sock.authState.creds.registered
 	) {
-		console.log("Using Pairing Code To Connect");
+		const phone_number = Config.phone_number.replace(/[^0-9]/g, "");
+		console.log("Using Pairing Code To Connect: ", phone_number);
 		await new Promise((resolve) => setTimeout(resolve, Config.pairing_wait));
-		const code = await sock.requestPairingCode(Config.phone_number);
+		const code = await sock.requestPairingCode(phone_number);
 		Print.success("Pairing Code:", code);
 	}
 
