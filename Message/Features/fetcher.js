@@ -18,9 +18,11 @@ export default {
 			return m.reply("Need url");
 		}
 
-		const { data, headers } = await axios.get(url, {
-			responseType: "arraybuffer",
-		});
+		const { data, headers } = await axios
+			.get(url, {
+				responseType: "arraybuffer",
+			})
+			.catch((e) => e?.response);
 
 		if (!data || !headers) {
 			return m.reply("Failed to fetch the url");
