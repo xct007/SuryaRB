@@ -1,4 +1,3 @@
-// File://home/rose/BOT/SuryaRB/Message/Features/youtube-video.js
 import { Readable } from "stream";
 import Y2Mate from "../../Libs/Y2Mate.js";
 
@@ -13,6 +12,10 @@ export default {
 	group: false,
 	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
 	execute: async function (m, { sock, args }) {
 		const url = args[0];
 		if (!url) {
@@ -50,6 +53,7 @@ export default {
 				[sendAs]: {
 					stream,
 				},
+				...(sendAs === "document" && { fileName: `${title}.mp4` }),
 				caption: `Title: ${title}\nAuthor: ${author}\nQuality: ${quality}\nSize: ${urls[quality].size}`,
 			},
 			{ quoted: m }
