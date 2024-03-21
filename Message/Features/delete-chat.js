@@ -15,14 +15,12 @@ export default {
 	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
 	 * @param {import("../Handler").miscOptions}
 	 */
-	execute: async function (m, { sock, isAdmin, isOwner, isBotAdmin }) {
+	execute: async function (m, { isAdmin, isOwner, isBotAdmin }) {
 		if (m.quoted) {
-			if (m.isGroup && (isAdmin || isOwner) && isBotAdmin) {
+			if (m.isGroup && (isAdmin || isOwner) && isBotAdmin && !m.quoted.fromMe) {
 				return m.quoted.delete();
 			}
-			if (m.quoted.fromMe) {
-				m.quoted.delete();
-			}
+			m.quoted.delete();
 		}
 	},
 	failed: "Failed to execute the %cmd command\n%error",
