@@ -67,6 +67,7 @@ export function Messages(upsert, sock) {
 	if (m.message) {
 		m.mtype = getContentType(m.message);
 
+		// let's keep it nested
 		if (m.mtype === "ephemeralMessage") {
 			m.message = m.message[m.mtype].message;
 			m.mtype = getContentType(m.message);
@@ -74,6 +75,9 @@ export function Messages(upsert, sock) {
 				m.message = m.message[m.mtype].message;
 				m.mtype = getContentType(m.message);
 			}
+		} else if (m.mtype === "viewOnceMessageV2") {
+			m.message = m.message[m.mtype].message;
+			m.mtype = getContentType(m.message);
 		}
 		try {
 			m.contextInfo = m.message[m.mtype]?.contextInfo || {};
@@ -161,24 +165,28 @@ export function Messages(upsert, sock) {
 					},
 					{ quoted: m }
 				);
-			m.replyUpdate = async (text, cb) => {
-				const response = await sock.sendMessage(
-					m.chat,
-					{ text: String(text) },
-					{ quoted: m }
-				);
-				if (typeof cb === "function") {
-					/**
-					 * @param {string} n_text - The new text to update the message.
-					 * @returns {void}
-					 */
-					cb((n_text) => {
-						sock.sendMessage(m.chat, {
-							text: String(n_text),
-							edit: response.key,
+			m.replyUpdate = (text, cb) => {
+				return new Promise(async (resolve) => {
+					const response = await sock.sendMessage(
+						m.chat,
+						{ text: String(text) },
+						{ quoted: m }
+					);
+					if (typeof cb === "function") {
+						/**
+						 * @param {string} n_text - The new text to update the message.
+						 * @returns {void}
+						 */
+						cb(async (n_text) => {
+							await sock.sendMessage(m.chat, {
+								text: String(n_text),
+								edit: response.key,
+							});
+							resolve();
 						});
-					});
-				}
+					}
+					resolve();
+				});
 			};
 			m.delete = () => sock.sendMessage(m.chat, { delete: m.key });
 			m.download = (pathFile) => downloadMedia(m.message, pathFile);
