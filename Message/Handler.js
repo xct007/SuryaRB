@@ -76,6 +76,10 @@ export async function Handler(upsert, sock) {
 		group.name = groupMetadata.subject;
 	}
 	const user = db.users.set(message.sender);
+	if (user.banned && !isOwner) {
+		return;
+	}
+	
 	user.name = message.pushName;
 	let executed_plugin = null;
 	try {
