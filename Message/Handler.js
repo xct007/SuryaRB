@@ -75,16 +75,41 @@ export async function Handler(upsert, sock) {
 		const group = db.groups.set(message.chat);
 		group.name = groupMetadata.subject;
 	}
+
 	const user = db.users.set(message.sender);
 	if (user.banned && !isOwner) {
 		return;
 	}
-	
+
 	user.name = message.pushName;
 	let executed_plugin = null;
 	try {
 		for (const name in feature.plugins) {
 			const plugin = feature.plugins[name];
+
+			// let's keep it like this for now
+			const miscOptions = {
+				args,
+				sock,
+				conn: sock,
+				api,
+				groupMetadata,
+				isOwner,
+				isAdmin,
+				isBotAdmin,
+				command,
+				text,
+				usedPrefix,
+				db,
+				feature: feature.plugins,
+			};
+			if (plugin.before && typeof plugin.before === "function") {
+				try {
+					await plugin.before(message, miscOptions);
+				} catch (error) {
+					console.error(error);
+				}
+			}
 			if (
 				plugin?.command
 					?.map((s) => s.toLowerCase())
@@ -124,21 +149,6 @@ export async function Handler(upsert, sock) {
 				executed_plugin = plugin;
 				Queue.add(message.sender, executed_plugin);
 
-				const miscOptions = {
-					args,
-					sock,
-					conn: sock,
-					api,
-					groupMetadata,
-					isOwner,
-					isAdmin,
-					isBotAdmin,
-					command,
-					text,
-					usedPrefix,
-					db,
-					feature: feature.plugins,
-				};
 				try {
 					// this is useless, but as you want
 					// if (plugin.wait) {
@@ -181,7 +191,7 @@ export async function Handler(upsert, sock) {
 					// 	);
 					// }
 				} catch (error) {
-					console.log(error);
+					console.log(error, plugin);
 					if (plugin.failed && typeof plugin.failed === "string") {
 						message.reply(
 							plugin.failed.replace("%cmd", command).replace("%error", String(error))
