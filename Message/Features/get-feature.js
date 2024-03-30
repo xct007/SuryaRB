@@ -1,6 +1,4 @@
-// File://home/rose/BOT/SuryaRB/Message/Features/get-feature.js
-import { readFileSync, readdirSync } from "fs";
-import { join } from "path";
+import { readFileSync } from "fs";
 
 export default {
 	command: ["getfeature", "getplug", "gp"],
