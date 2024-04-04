@@ -1,5 +1,3 @@
-// File://home/rose/BOT/SuryaRB/Utils/Prefix.js
-
 import { Config } from "../config.js";
 
 /**
@@ -17,24 +15,21 @@ function normalizePrefix(prefix) {
 /**
  * Extracts the command, arguments, and prefix from the given text based on the configured prefixes.
  * @param {string} text - The text to extract the command from.
- * @returns {[string, string, string]} - An array containing the command, arguments, and prefix.
+ * @returns {[string | null, string, string | null]} - An array containing the command, arguments, and prefix.
  */
 export function Prefix(text = "") {
 	const prefixes = normalizePrefix(Config.prefix);
-
 	for (const prefix of prefixes) {
 		if (text?.startsWith(prefix)) {
 			const textWithoutPrefix = text.slice(prefix.length).trim();
 			const parts = textWithoutPrefix.split(" ");
 			const command = parts.shift();
 			return [
-				command, // The command can be same as textWithoutPrefix
+				command.toLocaleLowerCase(),
 				textWithoutPrefix?.replace(command, "")?.trim() ?? text,
 				prefix,
 			];
 		}
 	}
-
-	// If no prefix is found, assume the entire text is the command.
-	return [text.trim(), text, ""];
+	return [null, text, null];
 }
