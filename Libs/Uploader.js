@@ -130,34 +130,6 @@ class FreeImageProvider extends Provider {
 }
 
 /**
- * @class StorageNekoProvider
- * @classdesc Upload a buffer to storage.neko.pe
- * @extends Provider
- */
-class StorageNekoProvider extends Provider {
-	/**
-	 * Upload a buffer to storage.neko.pe
-	 * @param {Buffer} buffer - The buffer to upload
-	 * @returns {Promise<string>} The URL of the uploaded file
-	 */
-	async upload(buffer) {
-		const { mime, ext } = await fileTypeFromBuffer(buffer);
-		const blob = new Blob([buffer], { type: mime });
-		const form = this.form("file", blob, `file.${ext}`);
-		const { data } = await axios.post(
-			"https://storage.neko.pe/backend/upload.php",
-			form,
-			{
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			}
-		);
-		return data.result.url_file;
-	}
-}
-
-/**
  * @class TmpFilesProvider
  * @classdesc Upload a buffer to tmpfiles.org
  * @extends Provider
@@ -183,6 +155,30 @@ class TmpFilesProvider extends Provider {
 }
 
 /**
+ * @class APIGratisProvider
+ * @classdesc Upload a buffer to files.apigratis.site
+ * @extends Provider
+ */
+class ApiGratisProvider extends Provider {
+	/**
+	 * Upload a buffer to tmpfiles.org
+	 * @param {Buffer} buffer - The buffer to upload
+	 * @returns {Promise<string>} The URL of the uploaded file
+	 */
+	async upload(buffer) {
+		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		const blob = new Blob([buffer], { type: mime });
+		const form = this.form("file", blob, `file.${ext}`);
+		const { data } = await axios.post("https://files.apigratis.site/upload", form, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
+		return data.result.url;
+	}
+}
+
+/**
  * @class Uploader
  * @classdesc Upload a buffer to a provider
  * @property {Object} providers - The available providers
@@ -198,8 +194,8 @@ class Uploader {
 			telegraph: new TelegraphProvider(),
 			quax: new QuaxProvider(),
 			freeimage: new FreeImageProvider(),
-			storageNeko: new StorageNekoProvider(),
 			tmpfiles: new TmpFilesProvider(),
+			apiGratis: new ApiGratisProvider(),
 		};
 	}
 
@@ -215,21 +211,21 @@ class Uploader {
 	/**
 	 * Upload a buffer to a provider
 	 * @param {Buffer} buffer - The buffer to upload
-	 * @param {string} type - The provider to upload to
+	 * @param {string} provider - The provider to upload to
 	 * @returns {Promise<string>} The URL of the uploaded file
 	 * @throws {Error} Uploader not found
 	 * @throws {Error} Buffer is not a buffer
 	 * @throws {Error} Error uploading file
 	 */
-	async upload(buffer, type) {
-		if (!this.providers[type]) {
+	async upload(buffer, provider) {
+		if (!this.providers[provider]) {
 			throw new Error("Uploader not found");
 		}
 		if (!Buffer.isBuffer(buffer)) {
 			throw new Error("Buffer is not a buffer");
 		}
 		try {
-			const url = await this.providers[type].upload(buffer);
+			const url = await this.providers[provider].upload(buffer);
 			return url;
 		} catch (error) {
 			throw new Error(error);
