@@ -110,11 +110,21 @@ export async function Handler(upsert, sock) {
 					console.error(error);
 				}
 			}
-			if (
-				plugin?.command
-					?.map((s) => s.toLowerCase())
-					.includes(command.toLocaleLowerCase())
-			) {
+
+			const isCostumPrefix = plugin?.customPrefix
+				? plugin.customPrefix.map((prefix) => prefix.toLowerCase()).includes(args[0])
+				: false;
+			if (isCostumPrefix) {
+				args.shift();
+				miscOptions.text = args.join(" ");
+				miscOptions.command = args[0];
+			}
+
+			const canExecuteCommand =
+				isCostumPrefix ||
+				plugin?.command?.map((s) => s.toLowerCase()).includes(command);
+
+			if (canExecuteCommand) {
 				if (Queue.exist(message.sender, plugin)) {
 					message.reply("You are still using this command");
 					return;
