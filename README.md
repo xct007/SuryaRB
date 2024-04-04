@@ -26,7 +26,7 @@
 - [Node.js](https://nodejs.org/en/download/) v20 or higher
 - [Git](https://git-scm.com/downloads)
 - [NPM](https://www.npmjs.com/get-npm) or [Yarn](https://yarnpkg.com/getting-started/install)
-- [FFmpeg](https://ffmpeg.org/download.html)
+- [FFmpeg](https://ffmpeg.org/download.html) **(required for Sticker and Audio features)**
 
 ## Installation
 
