@@ -14,12 +14,12 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-	- [Requirements](#requirements)
-	- [Installation](#installation)
-	- [Creating features/plugins](#creating-featuresplugins)
-	- [Contributing](#contributing)
-	- [License](#license)
-	- [Contributors](#contributors)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Creating features/plugins](#creating-featuresplugins)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contributors](#contributors)
 
 ## Requirements
 
@@ -65,6 +65,9 @@
 
    	// use .env file for API key
    	itsrose_apikey: process.env.ITSROSE_APIKEY,
+
+   	// timezone
+   	timezone: "Asia/Jakarta",
 
    	// Database settings
    	database: {

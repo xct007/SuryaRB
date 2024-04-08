@@ -1,19 +1,72 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { Mutex } from "async-mutex";
 import mongoose from "mongoose";
+import cron from "node-cron";
 import { Config } from "../config.js";
 import { UserSchema, GroupSchema, SettingsSchema } from "../Config/Schema.js";
 
-class Helper {
+class Crons {
 	/**
-	 * @param {string} n - The object name.
+	 * @param {string} name - The object name.
 	 * @param {object} data - The data object.
 	 * @param {object} schema - The schema object.
 	 */
-	constructor(n, data, schema) {
-		this.name = n;
-		this[n] = data ?? {};
+	constructor(name, data, schema) {
+		this.name = name;
+		this[name] = data ?? {};
 		this.schema = schema;
+	}
+
+	/**
+	 * Validates a cron expression.
+	 * @param {string} expression - The cron expression.
+	 * @returns {boolean} True if the cron expression is valid, false otherwise.
+	 */
+	validate(expression) {
+		return cron.validate(expression);
+	}
+
+	/**
+	 * Schedules a cron job.
+	 * @param {string} expression - The cron expression.
+	 * @param {Function} fun - The function to execute.
+	 * @param {import("node-cron").ScheduleOptions} options - The cron job options (optional
+	 * @returns {void}
+	 * @throws {Error} If the cron expression is invalid.
+	 */
+	schedule(expression, fun, options) {
+		if (!cron.validate(expression)) {
+			throw new Error("Invalid cron expression");
+		}
+		cron.schedule(
+			expression,
+			async () => {
+				fun(this[this.name]);
+			},
+			options
+		);
+	}
+
+	/**
+	 * Retrieves all the scheduled tasks.
+	 * @returns {import("node-cron").ScheduledTask[]} All the scheduled tasks.
+	 */
+	getTasks() {
+		return cron.getTasks();
+	}
+}
+class Helper {
+	/**
+	 * @param {string} name - The object name.
+	 * @param {object} data - The data object.
+	 * @param {object} schema - The schema object.
+	 */
+	constructor(name, data, schema) {
+		this.name = name;
+		this[name] = data ?? {};
+		this.schema = schema;
+
+		this.cron = new Crons(name, this[name], this.schema);
 	}
 	/**
 	 * Retrieves the value associated with the specified key from the database.
@@ -119,15 +172,37 @@ class Database {
 	 */
 	constructor() {
 		this._model = null;
-		this.initialize();
-		setInterval(() => {
-			this.#write();
-		}, Config?.database?.save_interval ?? 10_000);
+		// this.initialize();
+		// setInterval(() => {
+		// 	this.#write();
+		// }, Config?.database?.save_interval ?? 10_000);
+	}
+
+	/**
+	 * Writes the database data to the JSON file.
+	 * @private
+	 * @returns {void}
+	 */
+	#write() {
+		this.#mutex.runExclusive(async () => {
+			Config?.database?.debug && console.debug("Saving database...");
+			try {
+				if (Config?.database?.use_mongo) {
+					if (this._model) {
+						await this._model.updateOne({}, this.#data, { upsert: true });
+					}
+				}
+				writeFileSync(this.#path, JSON.stringify(this.#data, null, 2));
+			} catch (e) {
+				console.error(e);
+			} finally {
+				this.#mutex.release();
+			}
+		});
 	}
 
 	/**
 	 * Initializes the database.
-	 * @private
 	 * @returns {void}
 	 */
 	async initialize() {
@@ -207,26 +282,14 @@ class Database {
 	}
 
 	/**
-	 * Writes the database data to the JSON file.
-	 * @private
+	 * Saves the data periodically.
+	 * @param {number} interval - The interval to save the data.
 	 * @returns {void}
 	 */
-	#write() {
-		this.#mutex.runExclusive(async () => {
-			Config?.database?.debug && console.log("Saving database...");
-			try {
-				if (Config?.database?.use_mongo) {
-					if (this._model) {
-						await this._model.updateOne({}, this.#data, { upsert: true });
-					}
-				}
-				writeFileSync(this.#path, JSON.stringify(this.#data, null, 2));
-			} catch (e) {
-				console.error(e);
-			} finally {
-				this.#mutex.release();
-			}
-		});
+	saveDataPeriodically(interval = Config?.database?.save_interval ?? 10_000) {
+		setInterval(() => {
+			this.#write();
+		}, interval);
 	}
 }
 

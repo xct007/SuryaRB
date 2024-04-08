@@ -6,11 +6,13 @@ export default {
 	description: "Upload a file",
 	category: "Utility",
 	owner: false,
+	group: false,
 	admin: false,
 	hidden: false,
 	limit: false,
+	private: false,
 
-	execute: async function (m, { sock }) {
+	execute: async function (m, {}) {
 		const q = m.quoted ? m.quoted : m;
 		const mime = q.mtype || "";
 		if (!/webp|image|video|webm/g.test(mime)) {

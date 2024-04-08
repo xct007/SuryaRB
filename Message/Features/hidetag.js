@@ -7,7 +7,12 @@ export default {
 	admin: true,
 	hidden: false,
 	limit: false,
+	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
 	execute: async function (m, { sock, text, groupMetadata }) {
 		const len = groupMetadata.participants.length;
 		const mentions = [];
@@ -18,7 +23,7 @@ export default {
 				mention: `${serialized}@s.whatsapp.net`,
 			});
 		}
-		sock.sendMessage(m.chat, {
+		await sock.sendMessage(m.chat, {
 			text: text || "",
 			mentions: mentions.map((mention) => mention.mention),
 		});

@@ -7,6 +7,7 @@ export default {
 	admin: true,
 	hidden: false,
 	limit: false,
+	private: false,
 
 	/**
 	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.

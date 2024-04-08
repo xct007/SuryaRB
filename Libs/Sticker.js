@@ -1,7 +1,6 @@
 import ffmpeg from "fluent-ffmpeg";
 import { fileTypeFromBuffer } from "file-type";
-import { Readable } from "stream";
-import { readFileSync, existsSync, unlinkSync } from "fs";
+import { readFileSync, unlinkSync } from "fs";
 import pixelWidth from "string-pixel-width";
 import gm from "gm";
 import { tmpdir } from "os";
@@ -9,47 +8,7 @@ import { join } from "path";
 import crypto from "crypto";
 import webp from "node-webpmux";
 import { outputOptionsArgs } from "../Config/Sticker.js";
-
-/**
- * Converts the media buffer to a webp format using ffmpeg.
- * @param {Buffer} mediaBuffer - The media buffer to convert.
- * @param {string[]} args - The additional arguments for ffmpeg.
- * @param {string} format - The format to convert to (default: "webp").
- * @returns {Promise<Buffer>} - The converted media buffer.
- */
-async function convert(mediaBuffer, args, format = "webp") {
-	const tempPath = join(tmpdir(), crypto.randomBytes(16).toString("hex"));
-	return new Promise((resolve, reject) => {
-		const ffmpegProcess = ffmpeg()
-			.input(bufferToStream(mediaBuffer))
-			.addOutputOptions(args)
-			.toFormat(format)
-			.on("end", () => {
-				if (existsSync(tempPath)) {
-					const buffer = readFileSync(tempPath);
-					unlinkSync(tempPath);
-					resolve(buffer);
-				}
-			})
-			.on("error", (err) => {
-				reject(err);
-			});
-		ffmpegProcess.save(tempPath);
-	});
-}
-
-/**
- * Converts the media buffer to a stream.
- * @param {Buffer} buffer - The media buffer to convert.
- * @returns {Readable} - The converted media stream.
- * @private
- */
-function bufferToStream(buffer) {
-	const stream = new Readable();
-	stream.push(buffer);
-	stream.push(null);
-	return stream;
-}
+import { convert } from "./Converter.js";
 
 /**
  * Generates the metadata for the sticker.
@@ -154,7 +113,8 @@ class Sticker {
 			? outputOptionsArgs.image
 			: outputOptionsArgs.video;
 		const webpBuffer =
-			(!mime.includes("webp") && (await convert(mediaBuffer, args))) || mediaBuffer;
+			(!mime.includes("webp") && (await convert(mediaBuffer, args, "webp"))) ||
+			mediaBuffer;
 		const image = new webp.Image();
 		await image.load(webpBuffer);
 		const exifData = metadata(exif(packname, author, emojis));

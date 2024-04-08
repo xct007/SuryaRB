@@ -16,7 +16,7 @@ import db from "../Libs/Database.js";
  * @property {string[]} args - The arguments
  * @property {import("@whiskeysockets/baileys").WASocket} sock - The socket connection
  * @property {import("@whiskeysockets/baileys").WASocket} conn - The socket connection (alias)
- * @property {{get: (path: string, params?: any) => Promise<any>, post: (path: string, data?: any) => Promise<any>}} api - The API request
+ * @property {{get: import("../Utils/ApiRequest.js").get, post: import("../Utils/ApiRequest.js").post, request: import("../Utils/ApiRequest.js").request}} api - The api request
  * @property {import("@whiskeysockets/baileys").GroupMetadata}
  * @property {boolean} isOwner - If the user is the owner
  * @property {boolean} isAdmin - If the user is the admin
@@ -79,6 +79,12 @@ export async function Handler(upsert, sock) {
 	const user = db.users.set(message.sender);
 	if (user.banned && !isOwner) {
 		return;
+	}
+
+	// something seems wrong here
+	if (user.premium && user.premium_expired < Date.now()) {
+		user.premium = false;
+		user.premium_expired = 0;
 	}
 
 	user.name = message.pushName;

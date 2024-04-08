@@ -8,6 +8,7 @@ export default {
 	admin: true,
 	hidden: false,
 	limit: false,
+	private: false,
 
 	execute: async function (m, { sock, groupMetadata }) {
 		const len = groupMetadata.participants.length;

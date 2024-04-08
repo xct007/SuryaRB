@@ -6,9 +6,11 @@ export default {
 	description: "Create a sticker",
 	category: "Stickers",
 	owner: false,
+	group: false,
 	admin: false,
 	hidden: false,
 	limit: false,
+	private: false,
 
 	// we are know all of the parameters from the handler
 	execute: async function (m, { sock }) {
