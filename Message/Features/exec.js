@@ -1,9 +1,8 @@
-// Description: Execute a JavaScript code
-// Associated file: exec.js
-// Expected behaviour: Execute a JavaScript code
+import axios from "axios";
 
 export default {
 	command: ["=>"],
+	customPrefix: ["=>"],
 	description: "Evaluate a JavaScript code",
 	category: "Owner",
 	owner: true,
@@ -13,8 +12,21 @@ export default {
 	group: false,
 	private: false,
 
-	execute: async function (m, { text, args }) {
-		m.reply("Exec: " + text);
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
+	execute: async function (m, { text, args, sock, api, feature, db }) {
+		const str = `async function run() {  ${text} }; run();`;
+		try {
+			let result = await eval(str);
+			if (typeof result === "object") {
+				result = JSON.stringify(result, null, 2);
+			}
+			m.reply(`${result}`.trim());
+		} catch (error) {
+			m.reply(`Error: ${error.message}`);
+		}
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: null,
