@@ -3,6 +3,7 @@ export const UserSchema = {
 	limit: Number,
 	premium: Boolean,
 	premium_expired: Number,
+	emails: Array,
 	banned: Boolean,
 };
 
