@@ -8,6 +8,12 @@ import fs from "fs/promises";
 import Replace from "../Libs/Replaces.js";
 import { mimeMap } from "./Medias.js";
 
+/**
+ * Download the media from the message.
+ * @param {import("@whiskeysockets/baileys").proto.IMessage} message - The message object.
+ * @param {string} type - The media type.
+ * @returns {Promise<Buffer>} - The media buffer.
+ */
 const downloadMedia = async (message, pathFile) => {
 	const type = Object.keys(message)[0];
 	try {
@@ -28,20 +34,43 @@ const downloadMedia = async (message, pathFile) => {
 };
 
 /**
- * @typedef ExtendedWAMessage - The extended WAMessage object.
+ * @typedef {(pathFile: string | undefined) => Promise<Buffer | string | Error>} downloadMessage - Download the media and return the buffer or path.
+ * @typedef {(text: string, font?: string) => void} replyMessage - Reply to the message.
+ * @typedef {(text: string, cb: (update: (text: string) => void) => void) => Promise<void>} replyAndUpdateMessage - Reply to the message and update the message.
+ * @typedef {() => void} deleteMessage - Delete the message.
+ * @typedef {(emoji: string) => void} reactMessage - React to the message.
+ */
+
+/**
+ * @typedef {Object} ExtendedQuotedMessage - The extended quoted message object.
+ * @property {string} text - The message text.
+ * @property {string} participant - The participant JID.
+ * @property {string} sender - The sender JID.
+ * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} mtype - The message type.
+ * @property {string[]} mentionedJid - The mentioned JID.
+ * @property {import("@whiskeysockets/baileys").proto.IMessageKey} key - The message key.
+ * @property {import("@whiskeysockets/baileys").proto.IMessage} message - The message object.
+ * @property {deleteMessage} delete
+ * @property {downloadMessage} download
+ * @property {reactMessage} react
+ */
+
+/**
+ * @typedef {Object} ExtendedWAMessage - The extended WAMessage object.
+ * @property {string | null | undefined} id - The messageKey ID.
  * @property {string} chat - The chat JID.
  * @property {string} sender - The sender JID.
  * @property {boolean} isGroup - If the message is from a group.
- * @property {string} mtype - The message type.
+ * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} mtype - The message type.
  * @property {string} text - The message text.
- * @property {import("@whiskeysockets/baileys").proto.IMessageContextInfo} contextInfo - The context info.
- * @property {import("@whiskeysockets/baileys").WAMessage} quoted - The quoted message.
- * @property {(pathFile: string | undefined) => Promise<Buffer | string | Error>} download - Download the media and return the buffer or path.
- * @property {(text: string, font?: string) => void} reply - Reply to the message.
- * @property {(text: string, cb: (update: (text: string) => void) => void) => Promise<void>} replyUpdate - Reply to the message and update the message.
- * @property {() => void} delete - Delete the message.
- * @property {(emoji: string) => void} react - React to the message.
+ * @property {import("@whiskeysockets/baileys").proto.IContextInfo} contextInfo - The context info.
+ * @property {string[]} mentionedJid - The mentioned JID.
  * @property {boolean} mentionMe - If the message mentions the bot.
+ * @property {deleteMessage} delete - Delete the message.
+ * @property {downloadMessage} download - Download the media from the message.
+ * @property {replyMessage} reply - Reply to the message.
+ * @property {replyAndUpdateMessage} replyUpdate - Reply to the message and update the message.
+ * @property {import("@whiskeysockets/baileys").proto.IMessage & ExtendedQuotedMessage | null} quoted - The quoted message.
  */
 
 /**
@@ -53,6 +82,7 @@ const downloadMedia = async (message, pathFile) => {
  */
 export function Messages(upsert, sock) {
 	const { messages } = upsert;
+	/** @type {import("@whiskeysockets/baileys").WAMessage & ExtendedWAMessage} */
 	const m = messages[0];
 	if (m.key) {
 		const { id, remoteJid } = m.key;
@@ -108,7 +138,7 @@ export function Messages(upsert, sock) {
 					};
 				}
 				m.quoted.sender = m.quoted.participant;
-				m.quoted.mtype = m.quoted.type = Object.keys(m.quoted.message)[0];
+				m.quoted.mtype = Object.keys(m.quoted.message)[0];
 				m.quoted.mentionedJid =
 					m.quoted.message[m.quoted.mtype].contextInfo?.mentionedJid || [];
 
