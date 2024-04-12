@@ -98,3 +98,14 @@ export class Print {
 		this.printWithColor("white", ...message);
 	}
 }
+
+export async function printMessage(m, sock) {
+	console.log(
+		`${chalk.greenBright("[ MSG ]")}: ${chalk.bold(
+			chalk.italic(m.pushName),
+			chalk.bold(`- ${m.sender.replace(/[^0-9]/g, "")}`)
+		)} (${chalk.blueBright(
+			m.isGroup ? group.subject : "Private Chat"
+		)}): ${chalk.visible(m.text)}`
+	);
+}

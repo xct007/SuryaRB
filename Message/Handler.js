@@ -1,13 +1,11 @@
-// TODO: Refactor
-// File://home/rose/BOT/SuryaRB/Message/Handler.js
-import { performance } from "perf_hooks";
+// import { performance } from "perf_hooks";
 import Feature from "./Feature.js";
 import Queue from "../Libs/Queue.js";
 import { ApiRequest as api } from "../Utils/ApiRequest.js";
 import { Messages } from "../Utils/Messages.js";
 import { Prefix } from "../Utils/Prefix.js";
 import { Config } from "../config.js";
-import { Print } from "../Libs/Print.js";
+import { printMessage } from "../Libs/Print.js";
 
 import db from "../Libs/Database.js";
 
@@ -24,14 +22,17 @@ import db from "../Libs/Database.js";
  * @property {string} text - The text
  * @property {string} usedPrefix - The used prefix
  * @property {import("../Libs/Database").default} db - The database
+ * @property {typeof Feature.plugins} feature - The feature
+ * @property {ReturnType<import("../Utils/Store").Store>} store - The store
  */
 
 /**
  * Handles incoming messages
  * @param {import("@whiskeysockets/baileys").BaileysEventMap["messages.upsert"]} upsert - The upsert event
  * @param {import("@whiskeysockets/baileys").WASocket} sock - The socket connection
+ * @param {ReturnType<import("../Utils/Store").Store>} store - The store
  */
-export async function Handler(upsert, sock) {
+export async function Handler(upsert, sock, store) {
 	if (upsert.type !== "notify") {
 		return;
 	}
@@ -108,6 +109,7 @@ export async function Handler(upsert, sock) {
 				usedPrefix,
 				db,
 				feature: feature.plugins,
+				store,
 			};
 			if (plugin.before && typeof plugin.before === "function") {
 				try {
@@ -209,7 +211,7 @@ export async function Handler(upsert, sock) {
 					// 	);
 					// }
 				} catch (error) {
-					console.log(error, plugin);
+					console.error(error, plugin);
 					if (plugin.failed && typeof plugin.failed === "string") {
 						message.reply(
 							plugin.failed.replace("%cmd", command).replace("%error", String(error))
@@ -217,15 +219,18 @@ export async function Handler(upsert, sock) {
 					}
 				}
 			}
+
+			if (plugin.after && typeof plugin.after === "function") {
+				try {
+					await plugin.after(message, miscOptions);
+				} catch (error) {
+					console.error(error);
+				}
+			}
 		}
 	} catch (error) {
 		console.error(error);
 	}
 	Queue.remove(message.sender, executed_plugin);
-	Print.info(`From: ${message.sender}
-In: ${message.isGroup ? groupMetadata.subject : "Private Chat"}
-Type: ${message.mtype}
-RawText: ${message.text}
-Command: ${command ?? "No Command"}
-`);
+	printMessage(message, sock);
 }

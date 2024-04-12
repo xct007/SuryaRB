@@ -16,7 +16,7 @@ export const SettingsSchema = {
 	self: Boolean,
 };
 
-export const Features = {
+export const Feature = {
 	command: Array,
 	description: String,
 	category: String,

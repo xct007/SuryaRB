@@ -1,22 +1,34 @@
-// File://home/rose/BOT/SuryaRB/Message/Feature.js
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readdirSync, readFileSync, watch } from "node:fs";
 import { importFromString } from "import-from-string";
 import { Print } from "../Libs/Print.js";
-import { Features } from "../Config/Schema.js";
-class Feature {
+import { Feature } from "../Config/Schema.js";
+
+class Features {
 	constructor() {
+		/** @type {boolean} */
 		this.isInit = false;
+		/** @type {string} */
 		this.__dirname = dirname(fileURLToPath(import.meta.url));
+		/** @type {string} */
 		this.folder = `${this.__dirname}/Features`;
+		/** @type {Record<string, typeof Feature>>} */
 		this.plugins = {};
 	}
 
+	/**
+	 * Reads the files in the folder.
+	 * @returns {string[]} The files in the folder.
+	 */
 	read() {
 		return readdirSync(this.folder);
 	}
 
+	/**
+	 * Watches the folder for changes.
+	 * @returns {void}
+	 */
 	watch() {
 		watch(this.folder, (eventType, filename) => {
 			if (eventType === "change") {
@@ -29,8 +41,14 @@ class Feature {
 		});
 	}
 
+	/**
+	 * Parses the module.
+	 * @param {typeof Feature} module - The module.
+	 * @param {string} file - The file.
+	 * @returns {Promise<typeof Feature>} The parsed module.
+	 */
 	async parser(module, file) {
-		const keys = Object.keys(Features);
+		const keys = Object.keys(Feature);
 		for (const key of keys) {
 			if (!(key in module)) {
 				Print.warn(`Feature ${file} is missing the ${key}`);
@@ -48,6 +66,11 @@ class Feature {
 		return newModule;
 	}
 
+	/**
+	 * Imports the file.
+	 * @param {string} file - The file.
+	 * @returns {Promise<void>}
+	 */
 	async import(file) {
 		const isWindows = process.platform === "win32";
 		const timestamp = Date.now();
@@ -68,6 +91,10 @@ class Feature {
 		}
 	}
 
+	/**
+	 * Initializes the feature.
+	 * @returns {Promise<void>}
+	 */
 	async init() {
 		if (this.isInit) {
 			return;
@@ -86,4 +113,4 @@ class Feature {
 	}
 }
 
-export default new Feature();
+export default new Features();
