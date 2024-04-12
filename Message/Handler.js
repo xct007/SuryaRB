@@ -118,7 +118,9 @@ export async function Handler(upsert, sock) {
 			}
 
 			const isCostumPrefix = plugin?.customPrefix
-				? plugin.customPrefix.map((prefix) => prefix.toLowerCase()).includes(args[0])
+				? plugin.customPrefix
+						.map((prefix) => prefix.toLowerCase())
+						.includes(message.text.split(" ")[0].toLowerCase())
 				: false;
 			if (isCostumPrefix) {
 				args.shift();
