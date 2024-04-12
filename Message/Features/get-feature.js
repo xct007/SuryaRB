@@ -23,13 +23,9 @@ export default {
 		let found = false;
 
 		for (const key in feature) {
-			if (key === text) {
+			if (key === text || feature[key].command.includes(text)) {
 				found = feature[key].filePath;
-				continue;
-			}
-			if (feature[key].command.includes(text)) {
-				found = feature[key].filePath;
-				continue;
+				break;
 			}
 		}
 
