@@ -1,4 +1,3 @@
-// File://home/rose/BOT/SuryaRB/Utils/Medias.js
 export function isMediaMessage(str) {
 	return (
 		str === "imageMessage" ||

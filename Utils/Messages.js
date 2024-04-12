@@ -6,7 +6,7 @@ import {
 import fs from "fs/promises";
 
 import Replace from "../Libs/Replaces.js";
-import { mimeMap } from "./Medias.js";
+import { mimeMap } from "../Libs/Medias.js";
 
 /**
  * Download the media from the message.

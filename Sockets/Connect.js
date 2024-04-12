@@ -1,4 +1,3 @@
-// File://home/rose/BOT/SuryaRB/Sockets/Connect.js
 import {
 	makeWASocket,
 	fetchLatestBaileysVersion,
@@ -35,7 +34,9 @@ async function connectToWhatsApp(use_pairing_code = Config.use_pairing_code) {
 		},
 		generateHighQualityLinkPreview: true,
 		msgRetryCounterCache,
-		browser: ["Mac OS", "chrome", "121.0.6167.159"],
+		...(use_pairing_code
+			? { browser: ["Mac OS", "chrome", "121.0.6167.159"] }
+			: {}),
 		getMessage,
 	});
 
@@ -47,7 +48,7 @@ async function connectToWhatsApp(use_pairing_code = Config.use_pairing_code) {
 		!sock.authState.creds.registered
 	) {
 		const phone_number = Config.phone_number.replace(/[^0-9]/g, "");
-		console.log("Using Pairing Code To Connect: ", phone_number);
+		Print.debug("Using Pairing Code To Connect: ", phone_number);
 		await new Promise((resolve) => setTimeout(resolve, Config.pairing_wait));
 		const code = await sock.requestPairingCode(phone_number);
 		Print.success("Pairing Code:", code);
@@ -79,7 +80,7 @@ async function connectToWhatsApp(use_pairing_code = Config.use_pairing_code) {
 			}
 		}
 		if (ev["messages.upsert"]) {
-			Handler(ev["messages.upsert"], sock);
+			Handler(ev["messages.upsert"], sock, store);
 		}
 	});
 	/**
