@@ -52,13 +52,7 @@ export default {
 				delete user.games.numberGuest;
 			return;
 		}
-		if (numberGuest.chance <= 0) {
-			numberGuest.active = false;
-			delete user.games.numberGuest;
-			return m.reply(
-				`*[Number Guest]* You have run out of chances, the number was *${numberGuest.number}*`
-			);
-		}
+
 		const guess = Number(m.text.replace(/\s/g, ""));
 		if (guess === numberGuest.number) {
 			numberGuest.active = false;
@@ -72,7 +66,14 @@ export default {
 		}
 
 		numberGuest.chance--;
-
+		if (numberGuest.chance <= 0) {
+			numberGuest.active = false;
+			delete user.games.numberGuest;
+			return m.reply(
+				`*[Number Guest]* You have run out of chances, the number was *${numberGuest.number}*`
+			);
+		}
+        
 		// very close to the guess number
 		if (guess + 1 === numberGuest.number || guess - 1 === numberGuest.number) {
 			return m.reply("*[Number Guest]* You are very close to the number");
