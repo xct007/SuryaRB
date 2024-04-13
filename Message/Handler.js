@@ -1,11 +1,13 @@
-// import { performance } from "perf_hooks";
+// TODO: Refactor
+// File://home/rose/BOT/SuryaRB/Message/Handler.js
+import { performance } from "perf_hooks";
 import Feature from "./Feature.js";
 import Queue from "../Libs/Queue.js";
 import { ApiRequest as api } from "../Utils/ApiRequest.js";
 import { Messages } from "../Utils/Messages.js";
 import { Prefix } from "../Utils/Prefix.js";
 import { Config } from "../config.js";
-import { printMessage } from "../Libs/Print.js";
+import { Print } from "../Libs/Print.js";
 
 import db from "../Libs/Database.js";
 
@@ -22,17 +24,14 @@ import db from "../Libs/Database.js";
  * @property {string} text - The text
  * @property {string} usedPrefix - The used prefix
  * @property {import("../Libs/Database").default} db - The database
- * @property {typeof Feature.plugins} feature - The feature
- * @property {ReturnType<import("../Utils/Store").Store>} store - The store
  */
 
 /**
  * Handles incoming messages
  * @param {import("@whiskeysockets/baileys").BaileysEventMap["messages.upsert"]} upsert - The upsert event
  * @param {import("@whiskeysockets/baileys").WASocket} sock - The socket connection
- * @param {ReturnType<import("../Utils/Store").Store>} store - The store
  */
-export async function Handler(upsert, sock, store) {
+export async function Handler(upsert, sock) {
 	if (upsert.type !== "notify") {
 		return;
 	}
@@ -74,6 +73,9 @@ export async function Handler(upsert, sock, store) {
 
 	if (message.isGroup) {
 		const group = db.groups.set(message.chat);
+		if (group.banned && !isOwner) {
+			return;
+		}
 		group.name = groupMetadata.subject;
 	}
 
@@ -109,7 +111,6 @@ export async function Handler(upsert, sock, store) {
 				usedPrefix,
 				db,
 				feature: feature.plugins,
-				store,
 			};
 			if (plugin.before && typeof plugin.before === "function") {
 				try {
@@ -120,9 +121,7 @@ export async function Handler(upsert, sock, store) {
 			}
 
 			const isCostumPrefix = plugin?.customPrefix
-				? plugin.customPrefix
-						.map((prefix) => prefix.toLowerCase())
-						.includes(message.text.split(" ")[0].toLowerCase())
+				? plugin.customPrefix.map((prefix) => prefix.toLowerCase()).includes(args[0])
 				: false;
 			if (isCostumPrefix) {
 				args.shift();
@@ -137,29 +136,29 @@ export async function Handler(upsert, sock, store) {
 			if (canExecuteCommand) {
 				if (Queue.exist(message.sender, plugin)) {
 					message.reply("You are still using this command");
-					continue;
+					return;
 				}
 				if (plugin.owner && !isOwner) {
 					message.reply("Only the owner can use this command.");
-					continue;
+					return;
 				}
 				if (plugin.admin && message.isGroup && !isAdmin) {
 					message.reply("Only the admin can use this command.");
-					continue;
+					return;
 				}
 				if (plugin.group && !message.isGroup) {
 					message.reply("This command only available in group");
-					continue;
+					return;
 				}
 				if (plugin.private && message.isGroup) {
 					message.reply("This commnad only available in private chat");
-					continue;
+					return;
 				}
 
 				if (plugin.limit && !isOwner && !user.premium) {
 					if (user.limit < 0) {
 						message.reply("You have reached the limit of using this command");
-						continue;
+						return;
 					}
 					plugin.callback = () => {
 						user.limit--;
@@ -211,7 +210,7 @@ export async function Handler(upsert, sock, store) {
 					// 	);
 					// }
 				} catch (error) {
-					console.error(error, plugin);
+					console.log(error, plugin);
 					if (plugin.failed && typeof plugin.failed === "string") {
 						message.reply(
 							plugin.failed.replace("%cmd", command).replace("%error", String(error))
@@ -219,18 +218,15 @@ export async function Handler(upsert, sock, store) {
 					}
 				}
 			}
-
-			if (plugin.after && typeof plugin.after === "function") {
-				try {
-					await plugin.after(message, miscOptions);
-				} catch (error) {
-					console.error(error);
-				}
-			}
 		}
 	} catch (error) {
 		console.error(error);
 	}
 	Queue.remove(message.sender, executed_plugin);
-	printMessage(message, sock);
+	Print.info(`From: ${message.sender}
+In: ${message.isGroup ? groupMetadata.subject : "Private Chat"}
+Type: ${message.mtype}
+RawText: ${message.text}
+Command: ${command ?? "No Command"}
+`);
 }
