@@ -74,6 +74,9 @@ export async function Handler(upsert, sock, store) {
 
 	if (message.isGroup) {
 		const group = db.groups.set(message.chat);
+		if (group.banned && !isOwner) {
+			return;
+		}
 		group.name = groupMetadata.subject;
 	}
 
