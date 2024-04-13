@@ -19,7 +19,7 @@ export default {
 			user.games = {};
 		}
 		const numberGuest = user.games.numberGuest || {};
-		if (numberGuest.status) {
+		if (numberGuest.active) {
 			return m.reply("You have an active game");
 		}
 		numberGuest.active = true;
@@ -73,7 +73,7 @@ export default {
 				`*[Number Guest]* You have run out of chances, the number was *${numberGuest.number}*`
 			);
 		}
-        
+
 		// very close to the guess number
 		if (guess + 1 === numberGuest.number || guess - 1 === numberGuest.number) {
 			return m.reply("*[Number Guest]* You are very close to the number");
