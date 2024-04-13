@@ -3,7 +3,7 @@ export default {
 	description: "Unbanchat group.",
 	category: "Owner",
 	owner: true,
-	group: false,
+	group: true,
 	admin: false,
 	hidden: false,
 	limit: false,
