@@ -105,7 +105,11 @@ export async function printMessage(m, sock) {
 			chalk.italic(m.pushName),
 			chalk.bold(`- ${m.sender.replace(/[^0-9]/g, "")}`)
 		)} (${chalk.blueBright(
-			m.isGroup ? group.subject : "Private Chat"
+			m.isGroup
+				? await (
+						await sock.groupMetadata(m.chat)
+					).subject
+				: "Private Chat"
 		)}): ${chalk.visible(m.text)}`
 	);
 }
