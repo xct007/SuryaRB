@@ -137,29 +137,29 @@ export async function Handler(upsert, sock, store) {
 			if (canExecuteCommand) {
 				if (Queue.exist(message.sender, plugin)) {
 					message.reply("You are still using this command");
-					return;
+					continue;
 				}
 				if (plugin.owner && !isOwner) {
 					message.reply("Only the owner can use this command.");
-					return;
+					continue;
 				}
 				if (plugin.admin && message.isGroup && !isAdmin) {
 					message.reply("Only the admin can use this command.");
-					return;
+					continue;
 				}
 				if (plugin.group && !message.isGroup) {
 					message.reply("This command only available in group");
-					return;
+					continue;
 				}
 				if (plugin.private && message.isGroup) {
 					message.reply("This commnad only available in private chat");
-					return;
+					continue;
 				}
 
 				if (plugin.limit && !isOwner && !user.premium) {
 					if (user.limit < 0) {
 						message.reply("You have reached the limit of using this command");
-						return;
+						continue;
 					}
 					plugin.callback = () => {
 						user.limit--;

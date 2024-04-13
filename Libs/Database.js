@@ -203,7 +203,7 @@ class Database {
 
 	/**
 	 * Initializes the database.
-	 * @returns {void}
+	 * @returns {Promise<void>}
 	 */
 	async initialize() {
 		if (this.#initialized) {
@@ -290,6 +290,14 @@ class Database {
 		setInterval(() => {
 			this.#write();
 		}, interval);
+	}
+
+	/**
+	 * Retrieves the initialized status.
+	 * @returns {boolean} True if the database is initialized, false otherwise.
+	 */
+	get hasInitialized() {
+		return this.#initialized;
 	}
 }
 

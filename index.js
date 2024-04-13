@@ -6,14 +6,14 @@ import db from "./Libs/Database.js";
 import connectToWhatsApp from "./Sockets/Connect.js";
 import Feature from "./Message/Feature.js";
 
-db.initialize();
+await db.initialize();
 db.saveDataPeriodically();
 
 Feature.init();
 connectToWhatsApp();
 
 // TODO: move this to a separate file
-// run cron jobs every 24 hours, reset user limit
+// run cron jobs every 24 hours, reset user limit to 15
 db.users.cron.schedule(
 	"0 0 0 * * *",
 	(users) => {
@@ -24,3 +24,5 @@ db.users.cron.schedule(
 	},
 	{ timezone: Config.timezone ?? "Asia/Jakarta" }
 );
+
+// run other cron jobs here

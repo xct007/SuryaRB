@@ -5,6 +5,8 @@ export const UserSchema = {
 	premium_expired: Number,
 	emails: Array,
 	banned: Boolean,
+	balance: Number,
+	games: Object,
 };
 
 export const GroupSchema = {

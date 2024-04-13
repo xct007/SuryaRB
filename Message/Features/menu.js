@@ -38,16 +38,19 @@ export default {
 				continue;
 			}
 			message += `\`[ ${category} ]\`\n`;
+			
 			for (const plugin of plugins[category]) {
-				const command = Array.isArray(plugin.command)
-					? plugin.command[0]
-					: plugin.command;
+				const command = Array.isArray(plugin.customPrefix)
+					? plugin.customPrefix[0]
+					: plugin.customPrefix || Array.isArray(plugin.command)
+						? usedPrefix + plugin.command[0]
+						: usedPrefix + plugin.command;
 
 				// command
 				message +=
 					((plugin.owner && !isOwner) || (plugin.admin && !isAdmin)
-						? `*~${usedPrefix + command}~*`
-						: `*${usedPrefix + command}*`) + "\n";
+						? `~${command}~`
+						: `${command}`) + "\n";
 
 				// description
 				message += `> ${plugin.description}\n`;
