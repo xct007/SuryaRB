@@ -128,9 +128,9 @@ export async function Handler(upsert, sock, store) {
 						.includes(message.text.split(" ")[0].toLowerCase())
 				: false;
 			if (isCostumPrefix) {
-				args.shift();
-				miscOptions.text = args.join(" ");
-				miscOptions.command = args[0];
+				miscOptions.text = message.text.replace(message.text.split(" ")[0], "").trim();
+				miscOptions.args = miscOptions.text.split(" ");
+				miscOptions.command = message.text.split(" ")[0];
 			}
 
 			const canExecuteCommand =
