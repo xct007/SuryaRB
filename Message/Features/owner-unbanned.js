@@ -14,7 +14,10 @@ export default {
 	 * @param {import("../Handler").miscOptions} options - The options.
 	 */
 	execute: async function (m, { sock, db }) {
-		const _user = m?.quoted?.sender || m.mentionedJid[0];
+		const _user =
+			m?.quoted?.sender || m.mentionedJid[0] || text
+				? text.replace(/[^0-9]/g, "") + "@s.whatsapp.net"
+				: null;
 		if (!_user) {
 			return m.reply("Reply or tag a user");
 		}
