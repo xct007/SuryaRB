@@ -68,7 +68,12 @@ export async function Handler(upsert, sock, store) {
 	if (!feature.isInit) {
 		feature.init();
 	}
-	if (BOT_SETTINGS.self && !isOwner) {
+	if (
+		(BOT_SETTINGS.self ||
+			(BOT_SETTINGS.groupOnly && !m.isGroup) ||
+			(BOT_SETTINGS.privateChatOnly && m.isGroup)) &&
+		!isOwner
+	) {
 		return;
 	}
 

@@ -16,6 +16,8 @@ export const GroupSchema = {
 
 export const SettingsSchema = {
 	self: Boolean,
+	groupOnly: Boolean,
+	privateChatOnly: Boolean,
 };
 
 export const Feature = {

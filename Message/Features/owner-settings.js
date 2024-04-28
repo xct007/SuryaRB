@@ -16,13 +16,22 @@ export default {
 	execute: async function (m, { sock, args, db }) {
 		const setting = db.settings.set(sock.user.id);
 		const [key, value] = args;
-		if (!key || (!key) in setting) {
+		const aliases = {
+			self: "self",
+			pconly: "privateChatOnly",
+			gconly: "groupOnly",
+			...setting,
+		};
+		if (!key || (!key) in aliases) {
 			return m.reply(
-				`The available settings are: ${Object.keys(setting).join(", ")}`
+				`Available options\n\nOptions:\n${Object.keys(aliases)
+					.map((a) => "- " + a)
+					.join("\n")}`
 			);
 		}
 		// any value -> Boolean
-		setting[key] = value === "true" ? true : value === "false" ? false : value;
+		setting[aliases[key]] =
+			value === "true" ? true : value === "false" ? false : value;
 		return m.reply(`The ${key} setting has been changed to ${value}`);
 	},
 	failed: "Failed to execute the %cmd command\n\n%error",
