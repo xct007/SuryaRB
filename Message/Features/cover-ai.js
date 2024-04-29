@@ -1,8 +1,5 @@
-// import { to_audio } from "../../Libs/Converter.js";
-// import Uploader from "../../Libs/Uploader.js";
-
 export default {
-	command: ["cover", "coverai", "test"],
+	command: ["cover", "coverai"],
 	description: "AI song cover, create ai cover from youtube video",
 	category: "Audio",
 	owner: false,
