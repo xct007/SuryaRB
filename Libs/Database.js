@@ -51,15 +51,22 @@ class Crons {
 	 * Retrieves all the scheduled tasks.
 	 * @returns {import("node-cron").ScheduledTask[]} All the scheduled tasks.
 	 */
-	getTasks() {
+	get Tasks() {
 		return cron.getTasks();
 	}
 }
+
+/**
+ * @typedef {Object} SchemaMap
+ * @property {UserSchema} users
+ * @property {GroupSchema} groups
+ * @property {SettingsSchema} settings
+ */
 class Helper {
 	/**
 	 * @param {string} name - The object name.
 	 * @param {object} data - The data object.
-	 * @param {object} schema - The schema object.
+	 * @param {SchemaMap} schema - The schema object.
 	 */
 	constructor(name, data, schema) {
 		this.name = name;
@@ -72,7 +79,7 @@ class Helper {
 	 * Retrieves the value associated with the specified key from the database.
 	 * If the key doesn't exist, it creates a new object for the key from the schema.
 	 * @param {string} key - The key to retrieve the value for.
-	 * @returns {UserSchema | GroupSchema | SettingsSchema | null} The value associated with the key.
+	 * @returns {SchemaMap[this.name]} The value associated with the key.
 	 */
 	get(key) {
 		return this[this.name][key] ?? null;
@@ -82,7 +89,7 @@ class Helper {
 	 * Sets the value for the specified key in the database.
 	 * If the key already exists, it returns the existing value.
 	 * @param {string} key - The key to set the value for.
-	 * @returns {UserSchema | GroupSchema} The value associated with the key.
+	 * @returns {SchemaMap[this.name]} The value associated with the key.
 	 */
 	set(key) {
 		if (this[this.name][key]) {
@@ -115,19 +122,19 @@ class Helper {
 	}
 
 	/**
-	 * Retrieves all the data stored in the database.
-	 * @returns {{[key: string]: UserSchema | GroupSchema}} All the data stored in the database.
-	 */
-	all() {
-		return this[this.name];
-	}
-
-	/**
 	 * Clears all the data stored in the database.
 	 * @returns {void}
 	 */
 	clear() {
 		this[this.name] = {};
+	}
+
+	/**
+	 * Retrieves all the data stored in the database.
+	 * @returns {SchemaMap} All the data stored in the database.
+	 */
+	get all() {
+		return this[this.name];
 	}
 }
 
@@ -172,10 +179,6 @@ class Database {
 	 */
 	constructor() {
 		this._model = null;
-		// this.initialize();
-		// setInterval(() => {
-		// 	this.#write();
-		// }, Config?.database?.save_interval ?? 10_000);
 	}
 
 	/**
@@ -206,7 +209,7 @@ class Database {
 	 * @returns {Promise<void>}
 	 */
 	async initialize() {
-		if (this.#initialized) {
+		if (this.hasInitialized) {
 			return;
 		}
 		if (Config?.database?.use_mongo) {
@@ -287,6 +290,9 @@ class Database {
 	 * @returns {void}
 	 */
 	saveDataPeriodically(interval = Config?.database?.save_interval ?? 10_000) {
+		if (this.hasInitialized) {
+			return;
+		}
 		setInterval(() => {
 			this.#write();
 		}, interval);
