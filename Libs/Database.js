@@ -290,9 +290,6 @@ class Database {
 	 * @returns {void}
 	 */
 	saveDataPeriodically(interval = Config?.database?.save_interval ?? 10_000) {
-		if (this.hasInitialized) {
-			return;
-		}
 		setInterval(() => {
 			this.#write();
 		}, interval);
