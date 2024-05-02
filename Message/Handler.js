@@ -70,8 +70,8 @@ export async function Handler(upsert, sock, store) {
 	}
 	if (
 		(BOT_SETTINGS.self ||
-			(BOT_SETTINGS.groupOnly && !m.isGroup) ||
-			(BOT_SETTINGS.privateChatOnly && m.isGroup)) &&
+			(BOT_SETTINGS.groupOnly && !message.isGroup) ||
+			(BOT_SETTINGS.privateChatOnly && message.isGroup)) &&
 		!isOwner
 	) {
 		return;
