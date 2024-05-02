@@ -51,6 +51,11 @@ export default {
 				}
 				statusData = await pollStatus();
 
+				// don't wait if is done.
+				if (statusData?.result?.status === "completed") {
+					break;
+				}
+
 				await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
 
 				retryCount++;
