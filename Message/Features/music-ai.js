@@ -65,8 +65,8 @@ export default {
 				}
 				statusData = await pollStatus();
 
-				// don't wait if is done.
-				if (statusData?.result?.status === "completed") {
+				// don't wait if is done/error.
+				if (statusData?.result?.status === "completed" || !statusData?.status) {
 					break;
 				}
 
