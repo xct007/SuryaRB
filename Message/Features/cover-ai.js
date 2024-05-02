@@ -34,32 +34,28 @@ export default {
 		}
 		const { id, status: n_status, source } = result;
 
-		await sock.sendMessage(
-			m.chat,
-			{
-				text: `*${n_status}* *_${voice_id}_*: ${source.title}`,
-			},
-			{ quoted: m }
+		m.reply(
+			`${n_status}, please wait for <= 2 minutes\n\n- voice id: ${voice_id}\n- Song title: ${source.title}`
 		);
 
 		// TODO: find better way to do this
 		async function pollStatus() {
 			return api.get("/audio/cover_ai/query", { id }).then((res) => res.data);
 		}
-		let statusData;
-		let retryCount = 0;
-		do {
-			if (retryCount > 15) {
-				break;
-			}
-			statusData = await pollStatus();
-
-			await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
-
-			retryCount++;
-		} while (statusData?.result?.status !== "completed");
-
 		try {
+			let statusData;
+			let retryCount = 0;
+			do {
+				if (retryCount > 15) {
+					break;
+				}
+				statusData = await pollStatus();
+
+				await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
+
+				retryCount++;
+			} while (statusData?.result?.status !== "completed");
+
 			const { status: l_status, message, result: n_result } = statusData;
 			if (!l_status) {
 				return m.reply(message || "Can't get the result!");
