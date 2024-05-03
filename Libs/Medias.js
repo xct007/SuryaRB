@@ -10,10 +10,14 @@ export function isMediaMessage(str) {
 	);
 }
 
+/**
+ * @type {keyof import("@whiskeysockets/baileys").proto.Message}
+ */
 export const mimeMap = {
 	imageMessage: "image",
 	videoMessage: "video",
 	stickerMessage: "sticker",
 	documentMessage: "document",
 	audioMessage: "audio",
+	ptvMessage: "ptv",
 };
