@@ -99,17 +99,20 @@ export class Print {
 	}
 }
 
+/**
+ *
+ * @param {ReturnType<import("../Utils/Messages").Messages>} m
+ * @param {import("@whiskeysockets/baileys").WASocket} sock
+ */
 export async function printMessage(m, sock) {
 	console.log(
-		`${chalk.greenBright("[ MSG ]")}: ${chalk.bold(
-			chalk.italic(m.pushName),
+		`${chalk.greenBright(`[ ${m.type} ]`)}: ${chalk.bold(
+			chalk.italic(m.pushName?.split("\n")[0]),
 			chalk.bold(`- ${m.sender.replace(/[^0-9]/g, "")}`)
 		)} (${chalk.blueBright(
 			m.isGroup
-				? await (
-						await sock.groupMetadata(m.chat)
-					).subject
+				? "Group " + (await sock.groupMetadata(m.chat)).subject
 				: "Private Chat"
-		)}): ${chalk.visible(m.text)}`
+		)})${m.text && ": " + m.text}`
 	);
 }
