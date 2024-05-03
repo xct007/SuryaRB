@@ -208,7 +208,8 @@ export function Serialize(upsert, sock) {
  * @property {string} text - The message text.
  * @property {string} participant - The participant JID.
  * @property {string} sender - The sender JID.
- * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} mtype - The message type.
+ * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} type - The message type.
+ * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} mtype - The message type or media mimetype.
  * @property {string[]} mentionedJid - The mentioned JID.
  * @property {import("@whiskeysockets/baileys").proto.IMessageKey} key - The message key.
  * @property {import("@whiskeysockets/baileys").proto.IMessage} message - The message object.
@@ -223,7 +224,8 @@ export function Serialize(upsert, sock) {
  * @property {string} chat - The chat JID.
  * @property {string} sender - The sender JID.
  * @property {boolean} isGroup - If the message is from a group.
- * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} mtype - The message type.
+ * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} type - The message type.
+ * @property {keyof import("@whiskeysockets/baileys").proto.IMessage} mtype - The message type or media mimetype.
  * @property {string} text - The message text.
  * @property {import("@whiskeysockets/baileys").proto.IContextInfo} contextInfo - The context info.
  * @property {string[]} mentionedJid - The mentioned JID.
