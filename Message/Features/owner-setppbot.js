@@ -1,4 +1,4 @@
-import jimp_1 from "jimp";
+import Jimp from "jimp";
 
 export default {
 	command: ["setpp", "ppbot"],
@@ -26,12 +26,12 @@ export default {
 		async function processProfilePicture(media) {
 			return new Promise(async (resolve, reject) => {
 				try {
-					const jimp = await jimp_1.read(media);
+					const jimp = await Jimp.read(media);
 					const min = jimp.getWidth();
 					const max = jimp.getHeight();
 					const cropped = jimp.crop(0, 0, min, max);
-					const img = await cropped.scaleToFit(720, 720).getBufferAsync(jimp_1.MIME_JPEG);
-					const preview = await cropped.normalize().getBufferAsync(jimp_1.MIME_JPEG);
+					const img = await cropped.scaleToFit(720, 720).getBufferAsync(Jimp.MIME_JPEG);
+					const preview = await cropped.normalize().getBufferAsync(Jimp.MIME_JPEG);
 					resolve({ img, preview });
 				} catch (error) {
 					reject(error);
