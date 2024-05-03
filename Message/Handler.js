@@ -46,18 +46,23 @@ export async function Handler(upsert, sock, store) {
 	const [command, text, usedPrefix] = Prefix(message.text);
 	const args = text?.split(" ").map((x) => x.trim()) || [];
 
+	/** @type {import("@whiskeysockets/baileys").GroupMetadata | {}} */
 	const groupMetadata = message.isGroup
 		? await sock.groupMetadata(message.chat)
 		: {};
 	const isOwner = Config.owners
 		.map((x) => x.replace(/[^0-9]/g, "") + "@s.whatsapp.net")
 		.includes(message.sender);
+
+	/** @type {Boolean} */
 	const isAdmin = message.isGroup
 		? groupMetadata.participants
 				.filter((participant) => participant.admin)
 				.map((participant) => participant.id)
 				.includes(message.sender)
 		: false;
+
+	/** @type {Boolean} */
 	const isBotAdmin = message.isGroup
 		? groupMetadata.participants
 				.filter((participant) => participant.admin)
@@ -86,6 +91,7 @@ export async function Handler(upsert, sock, store) {
 	}
 
 	const user = db.users.set(message.sender);
+
 	if (user.banned && !isOwner) {
 		return;
 	}

@@ -21,11 +21,28 @@ export default {
 		}
 
 		// genders = [male, female, random]
-		// moods = [happy, confident, hype, romantic, dark]
+		// moods = [happy, confident, hype, romantic, dark] etc..
+		// genres = see docs
+		const options = {
+			gender: "female",
+		};
+
+		// Regular expression to match --option like cli wkwk
+		const regex = /--(\w+)\s+(\w+)\s*/g;
+
+		let match;
+		while ((match = regex.exec(prompt)) !== null) {
+			const opt_name = match[1];
+			const value = match[2];
+
+			options[opt_name] = value;
+		}
+
+		prompt = prompt.replace(regex, "").trim();
+
 		const { data } = await api.post("/audio/music_ai", {
 			prompt,
-			gender: "female",
-			// mood: "romantic",
+			...options,
 		});
 		const { status, message, result } = data;
 		if (!status) {
@@ -48,11 +65,12 @@ export default {
 				}
 				statusData = await pollStatus();
 
-				// don't wait if is done.
-				if (statusData?.result?.status === "completed") {
+				// don't wait if is done/error.
+				if (statusData?.result?.status === "completed" || !statusData?.status) {
 					break;
 				}
 
+				// wait for 30s
 				await new Promise((resolve) => setTimeout(resolve, 30 * 1000));
 
 				retryCount++;

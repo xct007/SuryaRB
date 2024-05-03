@@ -13,7 +13,7 @@ class Features {
 		this.__dirname = dirname(fileURLToPath(import.meta.url));
 		/** @type {string} */
 		this.folder = `${this.__dirname}/Features`;
-		/** @type {Record<string, typeof Feature>>} */
+		/** @type {Record<string, typeof Feature>} */
 		this.plugins = {};
 	}
 
