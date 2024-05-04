@@ -30,12 +30,12 @@ export default {
 			image_num: 1,
 			steps: 25,
 		};
+		const update = await m.replyUpdate("...");
 		if (/image/g.test(mime)) {
 			const media = await q.download();
 			const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
 			options["init_image"] = await Uploader.providers.telegraph.upload(buffer);
 		}
-		const update = await m.replyUpdate("...");
 		const { data } = await api.post("/image/diffusion", {
 			...options,
 		});
