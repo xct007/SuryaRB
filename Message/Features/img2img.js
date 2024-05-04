@@ -27,7 +27,7 @@ export default {
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const init_image = await Uploader.providers.telegraph.upload(buffer);
+		const init_image = await Uploader.providers.apiGratis.upload(buffer);
 
 		const update = await m.replyUpdate("...");
 		const { data } = await api.post("/image/diffusion/img2img", {
@@ -36,13 +36,13 @@ export default {
 			negative_prompt:
 				"nsfw, bad anatomy, lowres, extra hands, extra legs, extra finger",
 			init_image,
-			strength: 1,
+			strength: 0.7,
 			width: 512,
 			height: 512,
 			steps: 25,
 			model_id: "meinamix",
-			sampler: "UniPC",
-			cfg: 7.5,
+			sampler: "Euler a",
+			cfg: 3,
 			enhance_prompt: "no",
 			image_num: 1,
 			safety_checker: "yes",
