@@ -1,9 +1,8 @@
-// File://home/rose/BOT/SuryaRB/Utils/ApiRequest.js
 import axios from "axios";
 import { Config } from "../config.js";
 
 const instance = axios.create({
-	baseURL: "https://api.itsrose.life",
+	baseURL: "https://api.itsrose.rest",
 	headers: {
 		Authorization: "Bearer " + Config.itsrose_apikey,
 	},
