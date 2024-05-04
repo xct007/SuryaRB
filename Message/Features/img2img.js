@@ -27,51 +27,49 @@ export default {
 		}
 		const media = await q.download();
 		const buffer = Buffer.isBuffer(media) ? media : Buffer.from(media, "utf-8");
-		const url = await Uploader.providers.telegraph.upload(buffer);
+		const init_image = await Uploader.providers.telegraph.upload(buffer);
 
-		m.replyUpdate("...", async (update) => {
-			const { data } = await api.post("/image/diffusion/img2img", {
-				server_name: "jisoo",
-				prompt: text,
-				negative_prompt:
-					"nsfw, bad anatomy, lowres, extra hands, extra legs, extra finger",
-				init_image: url,
-				strength: 1,
-				width: 512,
-				height: 512,
-				steps: 25,
-				model_id: "meinamix",
-				sampler: "UniPC",
-				cfg: 7.5,
-				enhance_prompt: "yes",
-				image_num: 1,
-				safety_checker: "no",
-				safety_checker_type: "blur",
-			});
-
-			const { status, result, message } = data;
-
-			if (!status) {
-				return update(message);
-			}
-			update(`Image generated in ${result.generation_time.toFixed(2)} seconds`);
-			let metadataText = "";
-			for (const key in result.metadata) {
-				if (result.metadata.hasOwnProperty(key)) {
-					metadataText += `*${key}*: ${result.metadata[key]}\n`;
-				}
-			}
-			setTimeout(() => {
-				update(metadataText);
-				setTimeout(async () => {
-					await sock.sendMessage(
-						m.chat,
-						{ image: { url: result.images[0] } },
-						{ quoted: m }
-					);
-				}, result.generation_time * 1000);
-			}, result.generation_time * 1000);
+		const update = await m.replyUpdate("...");
+		const { data } = await api.post("/image/diffusion/img2img", {
+			server_name: "jisoo",
+			prompt: text,
+			negative_prompt:
+				"nsfw, bad anatomy, lowres, extra hands, extra legs, extra finger",
+			init_image,
+			strength: 1,
+			width: 512,
+			height: 512,
+			steps: 25,
+			model_id: "meinamix",
+			sampler: "UniPC",
+			cfg: 7.5,
+			enhance_prompt: "no",
+			image_num: 1,
+			safety_checker: "yes",
+			safety_checker_type: "blur",
 		});
+
+		const { status, result, message } = data;
+
+		if (!status) {
+			return update(message);
+		}
+		update(`Image generated in ${result.generation_time.toFixed(2)} seconds`);
+		let metadataText = "";
+		for (const key in result.metadata) {
+			if (result.metadata.hasOwnProperty(key)) {
+				metadataText += `*${key}*: ${result.metadata[key]}\n`;
+			}
+		}
+		await new Promise((resolve) =>
+			setTimeout(resolve, result.generation_time * 1000)
+		);
+		update(metadataText);
+		await sock.sendMessage(
+			m.chat,
+			{ image: { url: result.images[0] } },
+			{ quoted: m }
+		);
 	},
 
 	failed: "Failed to execute the %cmd command\n%error",
