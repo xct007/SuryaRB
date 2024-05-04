@@ -72,18 +72,36 @@ export function Messages(upsert, sock) {
 			{ quoted: m }
 		);
 
-	m.replyUpdate = async (text, cb) => {
+	/**
+	 * Represents a function that updates a message with new text.
+	 * @typedef {function(string | null): Promise<void>} UpdateCallback
+	 * @param {string | null} n_text - The new text to set (or null to keep the original text).
+	 * @returns {Promise<void>} - A Promise that resolves when the update is complete.
+	 */
+
+	/**
+	 *
+	 * @param {string} text - The initial text to send.
+	 * @param {undefined | (function(UpdateCallback): void)} cb - A callback function that receives an update function.
+	 * @returns {function(UpdateCallback): void} - The update function.
+	 */
+	const replyUpdate = async (text, cb) => {
 		const response = await sock.sendMessage(
 			m.chat,
 			{ text: String(text) },
 			{ quoted: m }
 		);
 		if (typeof cb === "function") {
-			cb(async (n_text) => {
-				await sock.sendMessage(m.chat, { text: String(n_text), edit: response.key });
-			});
+			await cb(async (n_text) =>
+				sock.sendMessage(m.chat, { text: n_text || "", edit: response.key })
+			).catch(() => {});
 		}
+		async function update(n_text) {
+			await sock.sendMessage(m.chat, { text: String(n_text), edit: response.key });
+		}
+		return update;
 	};
+	m.replyUpdate = replyUpdate;
 
 	m.delete = () => sock.sendMessage(m.chat, { delete: m.key });
 	m.download = (pathFile) => downloadMedia(m.message, pathFile);
@@ -198,7 +216,7 @@ export function Serialize(upsert, sock) {
 /**
  * @typedef {(pathFile: string | undefined) => Promise<Buffer | string | Error>} downloadMessage - Download the media and return the buffer or path.
  * @typedef {(text: string, font?: string) => void} replyMessage - Reply to the message.
- * @typedef {(text: string, cb: (update: (text: string) => void) => void) => Promise<void>} replyAndUpdateMessage - Reply to the message and update the message.
+ * @typedef {(text: string, cb: undefined | (function(UpdateCallback): void)) => Promise<(function(UpdateCallback): void)>} replyAndUpdateMessage - Reply to the message and update the message.
  * @typedef {() => void} deleteMessage - Delete the message.
  * @typedef {(emoji: string) => void} reactMessage - React to the message.
  */
