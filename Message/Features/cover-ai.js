@@ -38,50 +38,50 @@ export default {
 			`${n_status}, please wait for <= 2 minutes\n\n- voice id: ${voice_id}\n- Song title: ${source.title}`
 		);
 
-		// TODO: find better way to do this
-		async function pollStatus() {
-			return api.get("/audio/cover_ai/query", { id }).then((res) => res.data);
-		}
-		try {
-			let statusData;
-			let retryCount = 0;
-			do {
-				if (retryCount > 15) {
-					break;
-				}
-				statusData = await pollStatus();
-
-				// don't wait if is done.
-				// don't wait if is done/error.
-				if (statusData?.result?.status === "completed" || !statusData?.status) {
-					break;
-				}
-
-				await new Promise((resolve) => setTimeout(resolve, 15 * 1000));
-
-				retryCount++;
-			} while (statusData?.result?.status !== "completed");
-
-			const { status: l_status, message, result: n_result } = statusData;
-			if (!l_status) {
-				return m.reply(message || "Can't get the result!");
+		const MAX_RETRIES = 15;
+		const RETRY_DELAY = 30 * 1000;
+		async function pollStatus(id) {
+			try {
+				const res = await api.get("/audio/cover_ai/query", { id });
+				return res.data;
+			} catch (error) {
+				console.error(`Error polling status: ${error}`);
+				return null;
 			}
-			await sock.sendMessage(
-				m.chat,
-				{
-					[format]: {
-						url: n_result.url,
-					},
-					...((format === "audio" && {
-						mimetype: "audio/mp4",
-					}) || { caption: `*${voice_id}*: ${source.title}` }),
-				},
-				{ quoted: m }
-			);
-		} catch (e) {
-			console.error(e);
-			m.reply(String(e));
 		}
+		let retryCount = 0;
+		let statusData;
+		while (retryCount < MAX_RETRIES) {
+			statusData = await pollStatus(id);
+
+			if (
+				!statusData ||
+				statusData?.result?.status === "completed" ||
+				!statusData?.status
+			) {
+				break;
+			}
+
+			await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+			retryCount++;
+		}
+		if (!statusData || !statusData.status) {
+			return m.reply(statusData?.message || "Can't get the result!");
+		}
+
+		const { url } = statusData.result;
+		await sock.sendMessage(
+			m.chat,
+			{
+				[format]: {
+					url,
+				},
+				...((format === "audio" && {
+					mimetype: "audio/mp4",
+				}) || { caption: `*${voice_id}*: ${source.title}` }),
+			},
+			{ quoted: m }
+		);
 	},
 	failed: "Failed to execute the %cmd command\n%error",
 	wait: null,
