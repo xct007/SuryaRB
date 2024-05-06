@@ -94,7 +94,7 @@ class Helper {
 	 */
 	set(key) {
 		if (this[this.name][key]) {
-			// check if data has a valid schema and
+			// check if data has a valid schema
 			for (const k in this.schema) {
 				if (!this[this.name][key][k]) {
 					this[this.name][key][k] =
