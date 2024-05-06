@@ -52,7 +52,6 @@ export default {
 			{
 				text,
 				mentions: [user],
-				mimetype,
 			},
 			{ quoted: m }
 		);
