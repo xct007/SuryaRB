@@ -5,11 +5,16 @@ import cron from "node-cron";
 import { Config } from "../config.js";
 import { UserSchema, GroupSchema, SettingsSchema } from "../Config/Schema.js";
 
+/**
+ * @typedef SchemaMap - The schema map
+ * @type {Object.<string, function | string | number | boolean>}
+ */
 class Crons {
 	/**
+	 * Represents a collection of cron jobs.
 	 * @param {string} name - The object name.
 	 * @param {object} data - The data object.
-	 * @param {object} schema - The schema object.
+	 * @param {SchemaMap} schema - The schema object.
 	 */
 	constructor(name, data, schema) {
 		this.name = name;
@@ -30,7 +35,7 @@ class Crons {
 	 * Schedules a cron job.
 	 * @param {string} expression - The cron expression.
 	 * @param {Function} fun - The function to execute.
-	 * @param {import("node-cron").ScheduleOptions} options - The cron job options (optional
+	 * @param {import("node-cron").ScheduleOptions} options - The cron job options (optional).
 	 * @returns {void}
 	 * @throws {Error} If the cron expression is invalid.
 	 */
@@ -56,14 +61,9 @@ class Crons {
 	}
 }
 
-/**
- * @typedef {Object} SchemaMap
- * @property {UserSchema} users
- * @property {GroupSchema} groups
- * @property {SettingsSchema} settings
- */
 class Helper {
 	/**
+	 * Represents a helper class for database operations.
 	 * @param {string} name - The object name.
 	 * @param {object} data - The data object.
 	 * @param {SchemaMap} schema - The schema object.
@@ -75,6 +75,7 @@ class Helper {
 
 		this.cron = new Crons(name, this[name], this.schema);
 	}
+
 	/**
 	 * Retrieves the value associated with the specified key from the database.
 	 * If the key doesn't exist, it creates a new object for the key from the schema.
@@ -93,6 +94,13 @@ class Helper {
 	 */
 	set(key) {
 		if (this[this.name][key]) {
+			// check if data has a valid schema and
+			for (const k in this.schema) {
+				if (!this[this.name][key][k]) {
+					this[this.name][key][k] =
+						typeof this.schema[k] === "function" ? this.schema[k]() : this.schema[k];
+				}
+			}
 			return this[this.name][key];
 		}
 		this[this.name][key] = {};
@@ -139,9 +147,9 @@ class Helper {
 }
 
 /**
+ * Represents a database for storing data.
  * @class
- * Database class
- * @classdesc Represents a database for storing data.
+ * @classdesc Database class
  */
 class Database {
 	/**
@@ -227,6 +235,8 @@ class Database {
 		this.groups = new Helper("group", this.#data.groups, GroupSchema);
 		this.settings = new Helper("settings", this.#data.settings, SettingsSchema);
 
+		this.saveDataPeriodically();
+
 		this.#initialized = true;
 	}
 
@@ -286,10 +296,13 @@ class Database {
 
 	/**
 	 * Saves the data periodically.
-	 * @param {number} interval - The interval to save the data.
+	 * @param {number} [interval=10000] - The interval in milliseconds.
 	 * @returns {void}
 	 */
 	saveDataPeriodically(interval = Config?.database?.save_interval ?? 10_000) {
+		if (this.hasInitialized) {
+			return;
+		}
 		setInterval(() => {
 			this.#write();
 		}, interval);
