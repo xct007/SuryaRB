@@ -7,7 +7,6 @@ import connectToWhatsApp from "./Sockets/Connect.js";
 import Feature from "./Message/Feature.js";
 
 await db.initialize();
-db.saveDataPeriodically();
 
 Feature.init();
 connectToWhatsApp();
