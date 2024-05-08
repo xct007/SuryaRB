@@ -14,19 +14,19 @@ export default {
 	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
 	 * @param {import("../Handler").miscOptions}
 	 */
-	execute: async function (m, { sock, api, text }) {
+	execute: async function (m, { api, text }) {
 		if (!text) {
-			return m.reply("Need Text", "funky");
+			return m.reply("Need Text");
 		}
-		m.replyUpdate("...", async (update) => {
-			const { data } = await api.post("/cai/chat", {
-				character_id: "1cffd389-ecb5-4498-8780-a2734ceb5f14",
-				message: text,
-				enable_nsfw: false,
-			});
-			const { status, message, result } = data;
-			update(status ? result.message : message);
+		const update = await m.replyUpdate("...");
+		const { data } = await api.post("/cai/chat", {
+			character_id: "1cffd389-ecb5-4498-8780-a2734ceb5f14",
+			message: text,
+			enable_nsfw: false,
+			model: "rs_v8_72b",
 		});
+		const { status, message, result } = data;
+		update(status ? result.message : message);
 	},
 
 	failed: "Failed to execute the %cmd command\n\n%error",
