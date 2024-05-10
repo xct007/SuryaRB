@@ -34,6 +34,16 @@ class Provider {
 	}
 
 	/**
+	 * Get the file type of a buffer
+	 * @param {Buffer} buffer - The buffer to get the file type of
+	 * @returns {Promise<{mime: string, ext: string}>} The file type and extension
+	 */
+	async fileType(buffer) {
+		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		return { mime, ext };
+	}
+
+	/**
 	 * Upload a buffer to a provider
 	 * @param {Buffer} buffer - The buffer to upload
 	 * @returns {Promise<string>} The URL of the uploaded file
@@ -55,7 +65,7 @@ class TelegraphProvider extends Provider {
 	 * @returns {Promise<string>} The URL of the uploaded file
 	 */
 	async upload(buffer) {
-		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		const { mime, ext } = await this.fileType(buffer);
 		const blob = new Blob([buffer], { type: mime });
 		const form = this.form("file", blob, `file.${ext}`);
 		const { data } = await axios.post("https://telegra.ph/upload", form, {
@@ -79,7 +89,7 @@ class QuaxProvider extends Provider {
 	 * @returns {Promise<string>} The URL of the uploaded file
 	 */
 	async upload(buffer) {
-		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		const { mime, ext } = await this.fileType(buffer);
 		const blob = new Blob([buffer], { type: mime });
 		const form = this.form("files[]", blob, `file.${ext}`);
 		const { data } = await axios.post("https://qu.ax/upload.php", form, {
@@ -107,7 +117,7 @@ class FreeImageProvider extends Provider {
 			.get("https://freeimage.host/")
 			.catch(() => null);
 		const token = html.match(/PF.obj.config.auth_token = "(.+?)";/)[1];
-		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		const { mime, ext } = await this.fileType(buffer);
 		const blob = new Blob([buffer], { type: mime });
 		const form = this.form("source", blob, `file.${ext}`);
 		const options = {
@@ -141,7 +151,7 @@ class TmpFilesProvider extends Provider {
 	 * @returns {Promise<string>} The URL of the uploaded file
 	 */
 	async upload(buffer) {
-		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		const { mime, ext } = await this.fileType(buffer);
 		const blob = new Blob([buffer], { type: mime });
 		const form = this.form("file", blob, `file.${ext}`);
 		const { data } = await axios.post("https://tmpfiles.org/api/v1/upload", form, {
@@ -166,7 +176,7 @@ class ApiGratisProvider extends Provider {
 	 * @returns {Promise<string>} The URL of the uploaded file
 	 */
 	async upload(buffer) {
-		const { mime, ext } = await fileTypeFromBuffer(buffer);
+		const { mime, ext } = await this.fileType(buffer);
 		const blob = new Blob([buffer], { type: mime });
 		const form = this.form("file", blob, `file.${ext}`);
 		const { data } = await axios.post("https://files.apigratis.site/upload", form, {
@@ -237,5 +247,5 @@ const uploader = new Uploader();
 
 export default uploader;
 
-export const { telegraph, quax, freeimage, storageNeko, tmpfiles } =
+export const { telegraph, quax, freeimage, apiGratis, tmpfiles } =
 	uploader.providers;
