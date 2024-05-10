@@ -14,12 +14,12 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Creating features/plugins](#creating-featuresplugins)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Contributors](#contributors)
+	- [Requirements](#requirements)
+	- [Installation](#installation)
+	- [Creating features/plugins](#creating-featuresplugins)
+	- [Contributing](#contributing)
+	- [License](#license)
+	- [Contributors](#contributors)
 
 ## Requirements
 
@@ -162,6 +162,10 @@ export default {
 			// update the message
 			update("new message");
 		});
+		// or
+		const update = await m.replyUpdate("Hi");
+		// do something
+		update("Hi again");
 
 		// react to the message
 		m.react("👍");
