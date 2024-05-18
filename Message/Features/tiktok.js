@@ -1,4 +1,4 @@
-// File://home/rose/BOT/SuryaRB/Message/Features/tiktok.js
+// File:///home/rose/BOT/SuryaRB/Message/Features/tiktok.js
 
 export default {
 	command: ["tiktok", "tt"],
@@ -17,9 +17,21 @@ export default {
 			return m.reply("Please provide a TikTok link");
 		}
 		const { data } = await api.get("/downloader/tiktok", { url });
-		const { status, message, download, desc } = data;
+		const { status, message, type: _t, download, desc } = data;
 		if (!status) {
 			return m.reply(message);
+		}
+		if (_t === "images") {
+			// m.sender
+			for (const url of download.images) {
+				await sock.sendMessage(
+					m.chat,
+					{ images: { url } },
+					{ quoted: m }
+				)
+			}
+			download.music && await sock.sendMessage(m.chat, { audio: { url: download.music } }, { quoted: m });
+			return;
 		}
 		await sock.sendMessage(
 			m.chat,
