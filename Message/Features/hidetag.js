@@ -14,6 +14,7 @@ export default {
 	 * @param {import("../Handler").miscOptions} options - The options.
 	 */
 	execute: async function (m, { sock, text, groupMetadata }) {
+		const q = m.quoted ? m.quoted : m;
 		const len = groupMetadata.participants.length;
 		const mentions = [];
 		for (let i = 0; i < len; i++) {
@@ -24,7 +25,7 @@ export default {
 			});
 		}
 		await sock.sendMessage(m.chat, {
-			text: text || "",
+			text: text ? text : q.text || "",
 			mentions: mentions.map((mention) => mention.mention),
 		});
 	},
