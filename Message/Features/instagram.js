@@ -1,5 +1,6 @@
 // File://home/rose/BOT/SuryaRB/Message/Features/tiktok.js
 import axios from "axios";
+import { fileTypeFromBuffer } from "file-type";
 
 export default {
 	command: ["instagram", "ig"],
@@ -12,6 +13,10 @@ export default {
 	group: false,
 	private: false,
 
+	/**
+	 * @param {import("../../Utils/Messages").ExtendedWAMessage} m - The message object.
+	 * @param {import("../Handler").miscOptions} options - The options.
+	 */
 	execute: async function (m, { sock, api, args }) {
 		const url = args[0];
 		if (!url) {
@@ -22,21 +27,23 @@ export default {
 		if (!status) {
 			return m.reply(message);
 		}
-		const contentType = async (url) =>
-			axios
-				.head(url)
-				.then((res) => res.headers["content-type"])
-				.catch(() => null);
-		for (const obj of result) {
-			const type = await contentType(obj.url);
+		const getT = async (url) => {
+			const { data } = await axios.get(url, { responseType: "arraybuffer" });
+			const { mime } = await fileTypeFromBuffer(data);
+			return [
+				mime.includes("video") ? "video" : mime.includes("audio") ? "audio" : "image",
+				data,
+			];
+		};
+		for (const url of result.urls) {
+			const [type, data] = await getT(url);
 			if (!type) {
 				continue;
 			}
 			await sock.sendMessage(
 				m.chat,
 				{
-					[type.includes("video") ? "video" : type.includes("audio") ? "audio" : "image"]:
-						{ url: obj.url },
+					[type]: data,
 				},
 				{ quoted: m }
 			);
