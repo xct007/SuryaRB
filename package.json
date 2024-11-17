@@ -44,7 +44,7 @@
 		"fluent-ffmpeg": "^2.1.2",
 		"gm": "^1.25.0",
 		"import-from-string": "^0.0.4",
-		"jimp": "^0.16.13",
+		"jimp": "^0.22.12",
 		"link-preview-js": "^3.0.5",
 		"mongoose": "^8.2.1",
 		"node-cron": "^3.0.3",
