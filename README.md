@@ -1,3 +1,5 @@
+# [Moved here](https://github.com/frierendv/surya)
+
 <div align="center">
     <h1>
 	    <i>SURYA</i> </br> EXCLUSIVE
