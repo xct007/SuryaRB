@@ -46,7 +46,7 @@
 		"import-from-string": "^0.0.5",
 		"jimp": "^0.16.13",
 		"link-preview-js": "^3.0.12",
-		"mongoose": "^8.8.3",
+		"mongoose": "^8.9.5",
 		"node-cron": "^3.0.3",
 		"node-webpmux": "^3.2.0",
 		"qrcode-terminal": "^0.12.0",
